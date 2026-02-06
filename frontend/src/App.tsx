@@ -1,6 +1,7 @@
 import React, { FormEvent, useMemo, useState } from 'react';
 import { Client, Room } from '@colyseus/sdk';
 import './App.css';
+import FPSGame from './components/FPSGame';
 
 const ENDPOINT =
   process.env.REACT_APP_COLYSEUS_ENDPOINT?.trim() ||
@@ -100,7 +101,7 @@ function App() {
         setStatus(`Disconnected from lobby (code ${code}).`);
         setRoom(null);
       });
-      joinedRoom.onError((code: number, message?: string) => {
+      joinedRoom.onError((code: number | undefined, message: string | undefined) => {
         setStatus(`Room error (${code}): ${message ?? 'unknown error'}`);
       });
     } catch (error) {
@@ -111,6 +112,10 @@ function App() {
       setIsJoining(false);
     }
   };
+
+  if (room) {
+    return <FPSGame />;
+  }
 
   return (
     <div className="app">
