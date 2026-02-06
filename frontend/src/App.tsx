@@ -1,84 +1,42 @@
-import React, { FormEvent, useMemo, useState } from 'react';
-import { Client, Room } from '@colyseus/sdk';
+import React, { useState, useCallback } from 'react';
 import './App.css';
-
-const ENDPOINT =
-  process.env.REACT_APP_COLYSEUS_ENDPOINT?.trim() ||
-  `${window.location.protocol === 'https:' ? 'wss' : 'ws'}://${
-    window.location.hostname || 'localhost'
-  }:3000`;
+import Animation from './Animation';
+import type { Rarity } from './Animation';
 
 function App() {
-  const [username, setUsername] = useState('');
-  const [status, setStatus] = useState('Enter a username to join the lobby.');
-  const [room, setRoom] = useState<Room | null>(null);
-  const [isJoining, setIsJoining] = useState(false);
+  const [playing, setPlaying] = useState(false);
 
-  const client = useMemo(() => new Client(ENDPOINT), []);
+  const handlePlay = useCallback(() => setPlaying(true), []);
+  const handleDone = useCallback(() => setPlaying(false), []);
 
-  const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
-    event.preventDefault();
-    if (!username.trim()) {
-      setStatus('Please choose a username first.');
-      return;
-    }
-
-    setIsJoining(true);
-    setStatus('Connecting to lobby...');
-
-    try {
-      const joinedRoom = await client.joinOrCreate('my_room', { username });
-      setRoom(joinedRoom);
-      setStatus(`Joined lobby as ${username}. Room id: ${joinedRoom.roomId}`);
-
-      joinedRoom.onLeave((code: number) => {
-        setStatus(`Disconnected from lobby (code ${code}).`);
-        setRoom(null);
-      });
-      joinedRoom.onError((code, message) => {
-        setStatus(`Room error (${code}): ${message ?? 'unknown error'}`);
-      });
-    } catch (error) {
-      console.error('Failed to join lobby', error);
-      const reason = (error as any)?.message || 'unknown error';
-      setStatus(`Unable to join lobby (${reason}). Endpoint: ${ENDPOINT}`);
-    } finally {
-      setIsJoining(false);
-    }
-  };
+  if (playing) {
+    return (
+      <Animation
+        rarity="common"
+        imageSrc="/victor_ssj.jpg"
+        onDone={handleDone}
+      />
+    );
+  }
 
   return (
-    <div className="app">
-      <div className="card">
-        <h1>Lobby Login</h1>
-        <form className="form" onSubmit={handleSubmit}>
-          <label htmlFor="username">Username</label>
-          <input
-            id="username"
-            type="text"
-            value={username}
-            onChange={e => setUsername(e.target.value)}
-            placeholder="Player name"
-            disabled={!!room || isJoining}
-          />
-          <button type="submit" disabled={isJoining || !!room}>
-            {room ? 'Connected' : isJoining ? 'Joining…' : 'Join Lobby'}
+    <div className="landing">
+      <div className="hero">
+        <div className="logo-slot" aria-label="Logo Epitech">
+          <span>Logo Epitech</span>
+        </div>
+        <h1 className="title">epitech el djihad</h1>
+        <p className="tagline">Le jeu le plus innovant de tout Epitech</p>
+        <div className="cta-row">
+          <button className="play" onClick={handlePlay}>
+            Jouer
           </button>
-        </form>
-
-        <p className="status">{status}</p>
-        <p className="status">Endpoint: {ENDPOINT}</p>
-
-        {room && (
-          <div className="room-details">
-            <div>
-            <strong>Room ID:</strong> {room.roomId}
-            </div>
-            <div>
-              <strong>Session ID:</strong> {room.sessionId}
-            </div>
-          </div>
-        )}
+        </div>
+      </div>
+      <div className="hero-visual" aria-hidden="true">
+        <div className="orb orb-1" />
+        <div className="orb orb-2" />
+        <div className="grid" />
       </div>
     </div>
   );
