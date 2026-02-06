@@ -1,4 +1,4 @@
-export interface Card {
+export interface Unity {
   id: string;
   basename: string;
   secondname?: string;
@@ -6,7 +6,6 @@ export interface Card {
   type: string;
 
   passive?: string;
-  activeSkill?: string;
   firstSkill?: string;
   superAttack?: string;
 
@@ -24,28 +23,28 @@ export interface Card {
   specialAttributes?: string[];
 }
 
-type Inventory = Record<string, Card[]>;
+type Inventory = Record<string, Unity[]>;
 
 class CardsService {
   private store: Inventory = {};
 
-  getInventory(userId: string): Card[] {
+  getInventory(userId: string): Unity[] {
     return this.store[userId] ?? [];
   }
 
-  setInventory(userId: string, items: Card[]): Card[] {
+  setInventory(userId: string, items: Unity[]): Unity[] {
     this.store[userId] = items;
     return this.store[userId];
   }
 
-  validatePayload(payload: unknown): Card[] {
+  validatePayload(payload: unknown): Unity[] {
     if (!Array.isArray(payload)) {
-      throw new Error("Payload must be an array of cards.");
+      throw new Error("Payload must be an array of Unitys.");
     }
 
     payload.forEach((item, index) => {
       const fail = (msg: string) =>
-        new Error(`Invalid card at index ${index}: ${msg}`);
+        new Error(`Invalid Unity at index ${index}: ${msg}`);
 
       if (typeof (item as any)?.id !== "string") throw fail("missing id");
       if (typeof (item as any)?.basename !== "string")
@@ -113,7 +112,7 @@ class CardsService {
       }
     });
 
-    return payload as Card[];
+    return payload as Unity[];
   }
 
   private isStringArrayMax(arr: any, max: number) {

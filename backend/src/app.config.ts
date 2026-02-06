@@ -14,6 +14,7 @@ import express from "express";
 import { MyRoom } from "./rooms/MyRoom.js";
 import { cardsRouter, cardsApiEndpoints } from "./cards/cards.routes.js";
 import { authRouter, authApiEndpoints } from "./auth/auth.routes.js";
+import { summonerRouter, summonerApiEndpoints } from "./summoner/summoner.routes.js";
 
 const server = defineServer({
     /**
@@ -35,7 +36,8 @@ const server = defineServer({
             return { message: "Hello World" }
         }),
         ...cardsApiEndpoints,
-        ...authApiEndpoints
+        ...authApiEndpoints,
+        ...summonerApiEndpoints,
     }),
 
     /**
@@ -46,6 +48,7 @@ const server = defineServer({
         app.use(express.json());
         app.use("/auth", authRouter);
         app.use("/inventory", cardsRouter);
+        app.use("/summoner", summonerRouter);
         app.get("/hi", (req, res) => {
             res.send("It's time to kick ass and chew bubblegum!");
         });
