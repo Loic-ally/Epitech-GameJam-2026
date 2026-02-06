@@ -2,6 +2,7 @@ import React, { FormEvent, useMemo, useState } from 'react';
 import { Client, Room } from '@colyseus/sdk';
 import './App.css';
 import FPSGame from './components/FPSGame';
+import { useRoom } from './hooks/useRoom';
 
 const ENDPOINT =
   process.env.REACT_APP_COLYSEUS_ENDPOINT?.trim() ||
@@ -21,6 +22,8 @@ type User = {
 };
 
 function App() {
+  const { room, setRoom } = useRoom();
+
   const [mode, setMode] = useState<'login' | 'register'>('login');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -31,7 +34,6 @@ function App() {
   const [token, setToken] = useState<string | null>(null);
 
   const [status, setStatus] = useState('Connecte-toi pour rejoindre le lobby.');
-  const [room, setRoom] = useState<Room | null>(null);
   const [isJoining, setIsJoining] = useState(false);
   const [isAuthLoading, setIsAuthLoading] = useState(false);
 
