@@ -6,11 +6,14 @@ import {
     createRouter,
     createEndpoint,
 } from "colyseus";
+import express from "express";
 
 /**
  * Import your Room files
  */
 import { MyRoom } from "./rooms/MyRoom.js";
+import { cardsRouter, cardsApiEndpoints } from "./cards/cards.routes.js";
+import { authRouter, authApiEndpoints } from "./auth/auth.routes.js";
 
 const server = defineServer({
     /**
@@ -30,7 +33,9 @@ const server = defineServer({
     routes: createRouter({
         api_hello: createEndpoint("/api/hello", { method: "GET", }, async (ctx) => {
             return { message: "Hello World" }
-        })
+        }),
+        ...cardsApiEndpoints,
+        ...authApiEndpoints
     }),
 
     /**
@@ -38,9 +43,15 @@ const server = defineServer({
      * Read more: https://expressjs.com/en/starter/basic-routing.html
      */
     express: (app) => {
+        app.use(express.json());
+        app.use("/auth", authRouter);
+        app.use("/inventory", cardsRouter);
         app.get("/hi", (req, res) => {
             res.send("It's time to kick ass and chew bubblegum!");
         });
+
+        // Inventory routes (Express)
+        // (moved to cardsRouter)
 
         /**
          * Use @colyseus/monitor
