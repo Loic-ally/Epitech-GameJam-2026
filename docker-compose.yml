@@ -1,0 +1,48 @@
+
+services:
+  mongodb:
+    image: mongo:latest
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_INITDB_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_INITDB_ROOT_PASSWORD}
+      - MONGO_INITDB_DATABASE=${MONGO_INITDB_DATABASE}
+    volumes:
+      - ./mongo-init.js:/docker-entrypoint-initdb.d/init.js:ro
+      - mongo_data:/data/db
+    networks:
+      - jam-network
+
+  api:
+    build:
+     context: ./backend
+     dockerfile: .docker/Dockerfile.dev
+    ports:
+      - "3000:2567"
+    volumes:
+      - ./backend:/app
+      - /app/node_modules
+    networks:
+      - jam-network
+
+  web:
+    build:
+      context: ./frontend
+      dockerfile: .docker/Dockerfile.dev
+    ports:
+      - "3001:3000"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - jam-network
+
+
+volumes:
+  mongo_data:
+
+networks:
+  jam-network:
+    driver: bridge
