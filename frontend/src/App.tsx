@@ -1,79 +1,96 @@
-import React, { useState, useCallback } from 'react';
+import React, { useCallback, useMemo, useState } from 'react';
 import './App.css';
-import Animation from './Animation';
-import type { Rarity } from './Animation';
-import { ALL_THEMES, ThemeName } from './themeEffects';
+import Animation, { type Rarity } from './Animation';
+import GachaPage, { type Banner } from './components/GachaPage';
+import { GACHA_BANNERS } from './data/banners';
 
-/* Human-readable labels for each theme */
-const THEME_LABELS: Record<ThemeName, string> = {
-  'aer': '🌬️ Aer',
-  'lunette': '👓 Lunette',
-  'travail': '🔧 Travail',
-  'bdg': '💥 BDG',
-  'bavard': '🗣️ Bavard',
-  'magrehb-united': '🌍 Magrehb United',
-  'pas-de-dodo': '😴 Pas de Dodo',
-  'tranquilou': '🍃 Tranquilou',
-  'moche': '💀 Moche',
-  'calvasse': '✨ Calvasse',
-  'chinois-de-la-caille': '🏮 Chinois de la Caillé',
-  'fou': '🤪 Fou',
-  'gourmand': '🍔 Gourmand',
-  'vieux': '👴 Vieux',
-  'coupe-de-cheveux-supecte': '💇 Coupe Suspecte',
-  'nain': '🧝 Nain',
-  'menteur': '🤥 Menteur',
-  'muet': '🤫 Muet',
-  'jamais-a-tek': '👥 Jamais à Tek',
-  'zesti': '🍋 Zesti',
-  'crack': '⚡ Crack',
-  'voix-grave': '🔊 Voix Grave',
-  'tchetchene': '🔥 Tchétchène',
-};
+function pickRarity(banner: Banner, count: 1 | 10): Rarity {
+  const order: Rarity[] = ['common', 'rare', 'epic', 'legendary'];
+  const roll = Math.random() * 100;
+  let cursor = 0;
+  let picked: Rarity = 'common';
 
-function App() {
-  const [activeTheme, setActiveTheme] = useState<ThemeName | null>(null);
-
-  const handleDone = useCallback(() => setActiveTheme(null), []);
-
-  if (activeTheme) {
-    return (
-      <Animation
-        rarity="legendary"
-        theme={activeTheme}
-        imageSrc="/victor_ssj.jpg"
-        onDone={handleDone}
-      />
-    );
+  for (const key of order) {
+    cursor += banner.dropRates[key];
+    if (roll <= cursor) {
+      picked = key;
+      break;
+    }
   }
 
+  if (count === 10 && picked === 'common') return 'rare';
+  return picked;
+}
+
+function App() {
+  const [gachaOpen, setGachaOpen] = useState(true);
+  const [pull, setPull] = useState<{ banner: Banner; rarity: Rarity; count: 1 | 10 } | null>(null);
+
+  const highlightedBanner = useMemo(() => GACHA_BANNERS[0], []);
+
+  const handlePull = useCallback((banner: Banner, count: 1 | 10) => {
+    const rarity = pickRarity(banner, count);
+    setPull({ banner, rarity, count });
+  }, []);
+
+  const closeAnimation = useCallback(() => setPull(null), []);
+
   return (
-    <div className="landing">
-      <div className="hero hero--wide">
-        <div className="logo-slot" aria-label="Logo Epitech">
-          <span>Logo Epitech</span>
+    <div className="world-shell">
+      <div className="map-card">
+        <div className="map-head">
+          <div>
+            <p className="eyebrow">Carte</p>
+            <h1>Hub principal</h1>
+            <p className="muted">
+              Déplace-toi sur la map. Le portail gacha est signalé en surbrillance : clique dessus ou sur le bouton
+              pour ouvrir la page des bannières.
+            </p>
+          </div>
+          <button className="play" onClick={() => setGachaOpen(true)}>Ouvrir le gacha</button>
         </div>
-        <h1 className="title">epitech el djihad</h1>
-        <p className="tagline">Choisis un thème pour voir son animation</p>
 
-        <div className="theme-grid">
-          {ALL_THEMES.map((theme) => (
-            <button
-              key={theme}
-              className={`theme-btn theme-btn--${theme}`}
-              onClick={() => setActiveTheme(theme)}
-            >
-              <span className="theme-btn__label">{THEME_LABELS[theme] || theme}</span>
-            </button>
-          ))}
+        <div className="map-grid">
+          <div className="map-node">
+            <span className="node-title">Hangar Nord</span>
+            <span className="node-meta">Boss hebdo</span>
+          </div>
+          <div className="map-node">
+            <span className="node-title">Quartier Est</span>
+            <span className="node-meta">Quêtes coop</span>
+          </div>
+          <button className="map-node map-node--gacha" onClick={() => setGachaOpen(true)}>
+            <span className="node-pulse" aria-hidden />
+            <span className="node-title">Portail Gacha</span>
+            <span className="node-meta">Place du Hub · {highlightedBanner.name}</span>
+          </button>
+          <div className="map-node">
+            <span className="node-title">Tour Sud</span>
+            <span className="node-meta">Défis solos</span>
+          </div>
+          <div className="map-node">
+            <span className="node-title">Bunker Ouest</span>
+            <span className="node-meta">Zone PvP</span>
+          </div>
         </div>
       </div>
 
-      <div className="hero-visual" aria-hidden="true">
-        <div className="orb orb-1" />
-        <div className="orb orb-2" />
-        <div className="grid" />
-      </div>
+      {gachaOpen && (
+        <GachaPage
+          banners={GACHA_BANNERS}
+          onClose={() => setGachaOpen(false)}
+          onPull={handlePull}
+        />
+      )}
+
+      {pull && (
+        <Animation
+          rarity={pull.rarity}
+          theme="crack"
+          imageSrc={pull.banner.image}
+          onDone={closeAnimation}
+        />
+      )}
     </div>
   );
 }
