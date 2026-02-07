@@ -114,7 +114,7 @@ const FPSGame: React.FC = () => {
         stats.domElement.style.top = '0px';
         container.appendChild(stats.domElement);
 
-        const GRAVITY = 20;
+        const GRAVITY = 50;
 
         const STEPS_PER_FRAME = 5;
 
