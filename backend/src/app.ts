@@ -3,20 +3,20 @@ import {
     defineRoom,
     monitor,
     playground,
-    createRouter,
-    createEndpoint,
 } from "colyseus";
-import { Lobby } from './rooms/lobby.js';
+import { Lobby } from './rooms/Lobby.js';
 import express from 'express';
 import cors from 'cors';
 import { authRouter } from "./modules/auth/auth.routes.js";
 import { inventoryRouter } from "./modules/inventory/inventory.routes.js";
 import { verifyAccess } from "./middlewares/auth.js";
 import { deckRouter } from "./modules/deck/deck.routes.js";
+import { BattleArena } from "./rooms/BattleArena.js";
 
 const server = defineServer({
     rooms: {
-        lobby: defineRoom(Lobby)
+        lobby: defineRoom(Lobby),
+        battle_arena: defineRoom(BattleArena)
     },
 
     express: (app) => {
