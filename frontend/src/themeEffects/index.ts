@@ -1,12 +1,4 @@
-/* ══════════════════════════════════════════════════════════════
-   themeEffects/index.ts – Theme map, animation engine & re-exports
-   ══════════════════════════════════════════════════════════════ */
-
-export type { ThemeName, Fx } from './shared';
-
 import type { ThemeName, Fx } from './shared';
-
-/* ── Theme imports (1 file per theme) ─── */
 import aer from './themes/aer';
 import lunette from './themes/lunette';
 import travail from './themes/travail';
@@ -30,6 +22,7 @@ import zesti from './themes/zesti';
 import crack from './themes/crack';
 import voixGrave from './themes/voix-grave';
 import tchetchene from './themes/tchetchene';
+export type { ThemeName, Fx } from './shared';
 
 /* ══════════════════════════════════════════════════════════════
    THEME MAP – one animation per unique theme
