@@ -33,23 +33,6 @@ export const AuthForm: React.FC<AuthFormProps> = ({
 }) => {
   return (
     <>
-      <div className="mode-switch">
-        <button
-          type="button"
-          className={mode === 'login' ? 'active' : ''}
-          onClick={() => onModeChange('login')}
-        >
-          Login
-        </button>
-        <button
-          type="button"
-          className={mode === 'register' ? 'active' : ''}
-          onClick={() => onModeChange('register')}
-        >
-          Register
-        </button>
-      </div>
-
       <form className="form" onSubmit={onSubmit}>
         <label htmlFor="email">Email</label>
         <input
@@ -99,6 +82,30 @@ export const AuthForm: React.FC<AuthFormProps> = ({
           {isLoading ? '...' : mode === 'login' ? 'Se connecter' : 'Créer le compte'}
         </button>
       </form>
+
+      {mode === 'login' ? (
+        <p className="register-hint">
+          New here?{' '}
+          <button 
+            type="button" 
+            className="register-link"
+            onClick={() => onModeChange('register')}
+          >
+            Register here
+          </button>
+        </p>
+      ) : (
+        <p className="register-hint">
+          Already have an account?{' '}
+          <button
+            type="button"
+            className="register-link"
+            onClick={() => onModeChange('login')}
+          >
+            Login
+          </button>
+        </p>
+      )}
     </>
   );
 };
