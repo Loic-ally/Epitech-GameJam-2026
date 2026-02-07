@@ -1,5 +1,5 @@
 import './App.css';
-import { LoginPage3D } from './pages/LoginPage3D';
+import AuthPage from './pages/AuthPage';
 import RoomsPage from './pages/RoomsPage';
 import { RoomProvider } from './context/RoomContext';
 import { useAuthSession } from './hooks/useAuthSession';
@@ -12,7 +12,7 @@ function App() {
       {session ? (
         <RoomsPage user={session.user} onLogout={logout} />
       ) : (
-        <LoginPage3D onLoginSuccess={authenticate} />
+        <AuthPage onAuthenticated={authenticate} />
       )}
     </RoomProvider>
   );
