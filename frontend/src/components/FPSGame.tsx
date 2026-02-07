@@ -45,24 +45,21 @@ const FPSGame: React.FC = () => {
         return sprite;
     };
 
-    const createPlayerModel = useCallback(async (position: { x: number, y: number, z: number }, name?: string, isLocal: boolean = false) => {
+    const createPlayerModel = useCallback(async (scene: THREE.Scene, position: { x: number, y: number, z: number }, name?: string, isLocal: boolean = false) => {
         const loader = new GLTFLoader().setPath('./models/gltf/');
-        const scene = sceneRef.current;
-
-        if (!scene) return;
 
         return new Promise<THREE.Group>((resolve) => {
             loader.load('Player.glb', function(gltf: GLTF) {
                 const playerClone = gltf.scene.clone();
                 playerClone.position.set(position.x, position.y, position.z);
-                
+
                 if (!isLocal && name) {
                     const label = createPlayerLabel(name);
                     if (label) {
                         playerClone.add(label);
                     }
                 }
-                
+
                 scene.add(playerClone);
                 resolve(playerClone);
             })
@@ -322,7 +319,6 @@ const FPSGame: React.FC = () => {
             }
         }
 
-        const triggeredStates = new Set<string>();
         let localCurrentRoomId: string | null = null;
 
         function checkRoomRegion() {
@@ -360,13 +356,19 @@ const FPSGame: React.FC = () => {
 
         renderer.setAnimationLoop(animate);
 
+        let playersCallback: any | null = null;
+
         if (room) {
             const callbacks = Callbacks.get(room as any) as any;
 
             callbacks.onAdd("players", async (entity: any, sessionId: string) => {
+                if (players.get(sessionId)) {
+                    return;
+                }
+
                 const isLocal = sessionId === room.sessionId;
-                const model = await createPlayerModel({ x: entity.x, y: entity.y, z: entity.z }, entity.displayName, isLocal);
-                
+                const model = await createPlayerModel(scene, { x: entity.x, y: entity.y, z: entity.z }, entity.displayName, isLocal);
+
                 players.set(sessionId, {
                     id: sessionId,
                     displayName: entity.displayName,
@@ -379,24 +381,33 @@ const FPSGame: React.FC = () => {
                 callbacks.listen(entity as any, "x", (currentPos: number) => {
                     const player = players.get(sessionId);
                     if (player) {
-                        player.x = currentPos;
-                        if (!isLocal) player.object?.position.setX(currentPos);
+                        if (sessionId !== room.sessionId) {
+                            console.log("x pos", currentPos);
+                        }
+                        player.object.position.setX(currentPos);
+                        players.set(sessionId, {
+                            ...player, x: currentPos,
+                        });
                     }
                 });
 
                 callbacks.listen(entity as any, "y", (currentPos: number) => {
                     const player = players.get(sessionId);
                     if (player) {
-                        player.y = currentPos;
-                        if (!isLocal) player.object?.position.setY(currentPos);
+                        player.object.position.setY(currentPos);
+                        players.set(sessionId, {
+                            ...player, y: currentPos,
+                        });
                     }
                 });
 
                 callbacks.listen(entity as any, "z", (currentPos: number) => {
                     const player = players.get(sessionId);
                     if (player) {
-                        player.z = currentPos;
-                        if (!isLocal) player.object?.position.setZ(currentPos);
+                        player.object.position.setZ(currentPos);
+                        players.set(sessionId, {
+                            ...player, z: currentPos,
+                        });
                     }
                 });
             });
@@ -425,6 +436,9 @@ const FPSGame: React.FC = () => {
 
             renderer.dispose();
             scene.clear();
+            if (playersCallback) {
+                playersCallback();
+            }
         };
     }, [createPlayerModel, room]);
 
