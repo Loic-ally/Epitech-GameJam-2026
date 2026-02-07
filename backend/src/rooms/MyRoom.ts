@@ -24,6 +24,7 @@ export class MyRoom extends Room {
     const player = new Player();
 
     player.id = client.sessionId;
+    player.displayName = options.displayName || "Anonymous";
     player.x = options.x || 0;
     player.y = options.y || 5;
     player.z = options.z || 0;

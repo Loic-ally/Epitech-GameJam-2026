@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, useState, type FC } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import * as THREE from "three";
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -12,12 +12,6 @@ import { Callbacks } from '@colyseus/sdk';
 import { Player } from '../types/player.type';
 import { ROOMS, RoomRegion } from '../config/rooms.config';
 
-interface TriggerZone {
-    box: THREE.Box3;
-    onEnter: () => void;
-    name: string;
-}
-
 const FPSGame: React.FC = () => {
     const containerRef = useRef<HTMLDivElement>(null);
     const sceneRef = useRef<THREE.Scene | null>(null);
@@ -25,23 +19,55 @@ const FPSGame: React.FC = () => {
     const { room } = useRoom();
     const [currentRoom, setCurrentRoom] = useState<RoomRegion | null>(null);
 
-    const createPlayer = useCallback((position: { x: number, y: number, z: number }) => {
+    const createPlayerLabel = (name: string) => {
+        const canvas = document.createElement('canvas');
+        const context = canvas.getContext('2d');
+        if (!context) return null;
+
+        canvas.width = 512;
+        canvas.height = 128;
+
+        context.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        context.roundRect(0, 0, canvas.width, canvas.height, 20);
+        context.fill();
+
+        context.font = 'bold 48px Arial';
+        context.fillStyle = 'white';
+        context.textAlign = 'center';
+        context.textBaseline = 'middle';
+        context.fillText(name, canvas.width / 2, canvas.height / 2);
+
+        const texture = new THREE.CanvasTexture(canvas);
+        const spriteMaterial = new THREE.SpriteMaterial({ map: texture, transparent: true });
+        const sprite = new THREE.Sprite(spriteMaterial);
+        sprite.scale.set(2, 0.5, 1);
+        sprite.position.y = 1.5; // Above player head
+        return sprite;
+    };
+
+    const createPlayerModel = useCallback(async (position: { x: number, y: number, z: number }, name?: string, isLocal: boolean = false) => {
         const loader = new GLTFLoader().setPath('./models/gltf/');
         const scene = sceneRef.current;
 
         if (!scene) return;
 
-        return new Promise((resolve) => {
+        return new Promise<THREE.Group>((resolve) => {
             loader.load('Player.glb', function(gltf: GLTF) {
                 const playerClone = gltf.scene.clone();
-
                 playerClone.position.set(position.x, position.y, position.z);
+                
+                if (!isLocal && name) {
+                    const label = createPlayerLabel(name);
+                    if (label) {
+                        playerClone.add(label);
+                    }
+                }
+                
                 scene.add(playerClone);
-
                 resolve(playerClone);
             })
         });
-    };
+    }, []);
 
     useEffect(() => {
         if (!containerRef.current) return;
@@ -96,29 +122,11 @@ const FPSGame: React.FC = () => {
         const STEPS_PER_FRAME = 5;
 
         const worldOctree = new Octree();
-        const triggers: TriggerZone[] = [];
-
-        const triggerMesh = new THREE.Mesh(
-            new THREE.BoxGeometry(2, 2, 2),
-            new THREE.MeshStandardMaterial({ color: 0x00ff00, wireframe: true, transparent: true, opacity: 0.5 })
-        );
-        triggerMesh.position.set(5, 1, 5);
-        scene.add(triggerMesh);
-
-        triggers.push({
-            name: 'example',
-            box: new THREE.Box3().setFromObject(triggerMesh),
-            onEnter: () => {
-                console.log('Player entered trigger zone!');
-                triggerMesh.material.color.set(0xff0000);
-            }
-        });
 
         const playerCollider = new Capsule(new THREE.Vector3(0, 0.35, 0), new THREE.Vector3(0, 1, 0), 0.35);
 
-        // Fixed Spawn Point
         const spawnPos = { x: 1.7, y: 0.7, z: -9.97 };
-        
+
         const setSpawn = (pos: { x: number, y: number, z: number }) => {
             playerCollider.start.set(pos.x, pos.y, pos.z);
             playerCollider.end.set(pos.x, pos.y + 0.65, pos.z);
@@ -206,7 +214,6 @@ const FPSGame: React.FC = () => {
 
             const deltaPosition = playerVelocity.clone().multiplyScalar(deltaTime);
             playerCollider.translate(deltaPosition);
-            console.log("Player Pos:", playerCollider.end.x, playerCollider.end.y, playerCollider.end.z);
 
             playerCollisions();
 
@@ -217,15 +224,17 @@ const FPSGame: React.FC = () => {
                     y: playerCollider.end.y,
                     z: playerCollider.end.z,
                 });
-                player?.object.position.set(playerCollider.end.x, playerCollider.end.y, playerCollider.end.z);
+                if (player.object) {
+                    player.object.position.set(playerCollider.end.x, playerCollider.end.y, playerCollider.end.z);
+                    // Hide local player model to avoid seeing inside own head
+                    player.object.visible = false;
+                }
             }
 
             sendMovement();
 
             camera.position.copy(playerCollider.end);
         }
-
-        createPlayer({x: 0, y: 1, z: 0});
 
         function getForwardVector() {
             camera.getWorldDirection(playerDirection);
@@ -335,19 +344,6 @@ const FPSGame: React.FC = () => {
             }
         }
 
-        function checkTriggers() {
-            for (const trigger of triggers) {
-                if (playerCollider.intersectsBox(trigger.box)) {
-                    if (!triggeredStates.has(trigger.name)) {
-                        trigger.onEnter();
-                        triggeredStates.add(trigger.name);
-                    }
-                } else {
-                    triggeredStates.delete(trigger.name);
-                }
-            }
-        }
-
         function animate() {
             const deltaTime = Math.min(0.05, clock.getDelta()) / STEPS_PER_FRAME;
 
@@ -355,7 +351,6 @@ const FPSGame: React.FC = () => {
                 controls(deltaTime);
                 updatePlayer(deltaTime);
                 teleportPlayerIfOob();
-                checkTriggers();
                 checkRoomRegion();
             }
 
@@ -368,43 +363,50 @@ const FPSGame: React.FC = () => {
         if (room) {
             const callbacks = Callbacks.get(room as any) as any;
 
-            callbacks.onAdd("players", (entity: Player, sessionId: string) => {
+            callbacks.onAdd("players", async (entity: any, sessionId: string) => {
+                const isLocal = sessionId === room.sessionId;
+                const model = await createPlayerModel({ x: entity.x, y: entity.y, z: entity.z }, entity.displayName, isLocal);
+                
                 players.set(sessionId, {
                     id: sessionId,
+                    displayName: entity.displayName,
                     x: entity.x,
                     y: entity.y,
-                    z: entity.z
+                    z: entity.z,
+                    object: model!
                 });
 
                 callbacks.listen(entity as any, "x", (currentPos: number) => {
                     const player = players.get(sessionId);
-
                     if (player) {
-                        players.set(sessionId, {
-                            ...player, x: currentPos,
-                        });
+                        player.x = currentPos;
+                        if (!isLocal) player.object?.position.setX(currentPos);
                     }
                 });
 
                 callbacks.listen(entity as any, "y", (currentPos: number) => {
                     const player = players.get(sessionId);
-
                     if (player) {
-                        players.set(sessionId, {
-                            ...player, y: currentPos,
-                        });
+                        player.y = currentPos;
+                        if (!isLocal) player.object?.position.setY(currentPos);
                     }
                 });
 
                 callbacks.listen(entity as any, "z", (currentPos: number) => {
                     const player = players.get(sessionId);
-
                     if (player) {
-                        players.set(sessionId, {
-                            ...player, z: currentPos,
-                        });
+                        player.z = currentPos;
+                        if (!isLocal) player.object?.position.setZ(currentPos);
                     }
                 });
+            });
+
+            callbacks.onRemove("players", (_entity: any, sessionId: string) => {
+                const player = players.get(sessionId);
+                if (player && player.object) {
+                    scene.remove(player.object);
+                }
+                players.delete(sessionId);
             });
         }
 
@@ -422,9 +424,9 @@ const FPSGame: React.FC = () => {
             window.removeEventListener('resize', onWindowResize);
 
             renderer.dispose();
-            scene.remove();
+            scene.clear();
         };
-    }, [createPlayer, room]);
+    }, [createPlayerModel, room]);
 
     return (
         <div ref={containerRef} id="container">
