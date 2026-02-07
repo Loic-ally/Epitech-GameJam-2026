@@ -20,7 +20,7 @@ export const LobbyPanel: React.FC<LobbyPanelProps> = ({
       <button type="submit" disabled={isJoining || !!room || !userDisplay}>
         {room ? 'Connecté' : isJoining ? 'Connexion...' : 'Rejoindre le lobby'}
       </button>
-      {userDisplay && <p className="status">Joueur: {userDisplay}</p>}
+      {userDisplay && <p className="status">Joueur : {userDisplay}</p>}
     </form>
   );
 };
