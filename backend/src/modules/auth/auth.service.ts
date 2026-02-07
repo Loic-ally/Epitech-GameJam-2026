@@ -12,7 +12,7 @@ export class AuthService {
 
     private generateAccessToken(payload: { _id: string }) {
         return jwt.sign(payload, ENV_VARS.JWT_ACCESS_TOKEN_SECRET, {
-            expiresIn: '1h',
+            expiresIn: '30d',
         });
     }
 

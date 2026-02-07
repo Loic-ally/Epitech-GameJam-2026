@@ -7,7 +7,6 @@ export class Lobby extends Room {
 
   onCreate (options: any) {
     this.state = new MyRoomState();
-    console.log(`MyRoom created with options:`, options);
 
     this.onMessage('move', (client, message) => {
       const player = this.state.players.get(client.sessionId);

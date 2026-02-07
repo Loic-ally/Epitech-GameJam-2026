@@ -10,8 +10,9 @@ import { Lobby } from './rooms/lobby.js';
 import express from 'express';
 import cors from 'cors';
 import { authRouter } from "./modules/auth/auth.routes.js";
-import { cardsRouter } from "./cards/cards.routes.js";
-import { summonerRouter } from "./summoner/summoner.routes.js";
+import { inventoryRouter } from "./modules/inventory/inventory.routes.js";
+import { verifyAccess } from "./middlewares/auth.js";
+import { deckRouter } from "./modules/deck/deck.routes.js";
 
 const server = defineServer({
     rooms: {
@@ -30,8 +31,8 @@ const server = defineServer({
         }));
 
         app.use("/auth", authRouter);
-        app.use("/inventory", cardsRouter);
-        app.use("/summoner", summonerRouter);
+        app.use("/inventory", verifyAccess, inventoryRouter);
+        app.use("/deck", verifyAccess, deckRouter);
 
         app.use("/monitor", monitor());
 
