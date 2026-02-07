@@ -18,11 +18,8 @@ const FPSGame: React.FC = () => {
     const playersRef = useRef<Map<string, Player>>(new Map());
     const { room } = useRoom();
 
-    const createPlayer = useCallback((position: { x: number, y: number, z: number }) => {
+    const createPlayer = (scene: THREE.Scene, position: { x: number, y: number, z: number }): Promise<THREE.Group<THREE.Object3DEventMap>> => {
         const loader = new GLTFLoader().setPath('./models/gltf/');
-        const scene = sceneRef.current;
-
-        if (!scene) return;
 
         return new Promise((resolve) => {
             loader.load('Player.glb', function(gltf: GLTF) {
@@ -34,7 +31,7 @@ const FPSGame: React.FC = () => {
                 resolve(playerClone);
             })
         });
-    };
+    }
 
     useEffect(() => {
         if (!containerRef.current) return;
@@ -289,21 +286,36 @@ const FPSGame: React.FC = () => {
 
         renderer.setAnimationLoop(animate);
 
+        let playersCallback = null;
+
         if (room) {
             const callbacks = Callbacks.get(room as any) as any;
 
-            callbacks.onAdd("players", (entity: Player, sessionId: string) => {
+            playersCallback = callbacks.onAdd("players", async (entity: Player, sessionId: string) => {
+                console.log(players);
+                if (players.get(sessionId)) {
+                    return;
+                }
+
+                const player = await createPlayer(scene, { x: entity.x, y: entity.y, z: entity.z });
+
+                console.log("Player added", sessionId, entity);
                 players.set(sessionId, {
                     id: sessionId,
                     x: entity.x,
                     y: entity.y,
-                    z: entity.z
+                    z: entity.z,
+                    object: player
                 });
 
                 callbacks.listen(entity as any, "x", (currentPos: number) => {
                     const player = players.get(sessionId);
 
                     if (player) {
+                        if (sessionId !== room.sessionId) {
+                            console.log("x pos", currentPos);
+                        }
+                        player.object.position.setX(currentPos);
                         players.set(sessionId, {
                             ...player, x: currentPos,
                         });
@@ -314,6 +326,7 @@ const FPSGame: React.FC = () => {
                     const player = players.get(sessionId);
 
                     if (player) {
+                        player.object.position.setY(currentPos);
                         players.set(sessionId, {
                             ...player, y: currentPos,
                         });
@@ -324,6 +337,7 @@ const FPSGame: React.FC = () => {
                     const player = players.get(sessionId);
 
                     if (player) {
+                        player.object.position.setZ(currentPos);
                         players.set(sessionId, {
                             ...player, z: currentPos,
                         });
@@ -347,8 +361,11 @@ const FPSGame: React.FC = () => {
 
             renderer.dispose();
             scene.remove();
+            if (playersCallback) {
+                playersCallback();
+            }
         };
-    }, [createPlayer, room]);
+    }, [room]);
 
     return (
         <div ref={containerRef} id="container">
