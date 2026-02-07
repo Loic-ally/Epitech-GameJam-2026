@@ -157,7 +157,8 @@ const FPSGame: React.FC = () => {
                     x: player.x,
                     y: player.y,
                     z: player.z,
-                    rotationY: camera.rotation.y
+                    rotationY: camera.rotation.y,
+                    rotationX: camera.rotation.x
                 });
             }
         };
@@ -233,9 +234,13 @@ const FPSGame: React.FC = () => {
                     x: playerCollider.end.x,
                     y: playerCollider.end.y,
                     z: playerCollider.end.z,
+                    rotationY: camera.rotation.y,
+                    rotationX: camera.rotation.x
                 });
                 if (player.object) {
                     player.object.position.set(playerCollider.end.x, playerCollider.end.y, playerCollider.end.z);
+                    player.object.rotation.y = camera.rotation.y;
+                    player.object.rotation.x = camera.rotation.x;
                     // Hide local player model to avoid seeing inside own head
                     player.object.visible = false;
                 }
@@ -327,7 +332,13 @@ const FPSGame: React.FC = () => {
                 camera.position.copy(playerCollider.end);
                 camera.rotation.set(0, Math.PI, 0);
                 if (room) {
-                    room.send("move", spawnPos);
+                    room.send("move", {
+                        x: spawnPos.x,
+                        y: spawnPos.y,
+                        z: spawnPos.z,
+                        rotationY: camera.rotation.y,
+                        rotationX: camera.rotation.x
+                    });
                 }
             }
         }
@@ -368,9 +379,10 @@ const FPSGame: React.FC = () => {
                 if (sessionId === room?.sessionId) return;
                 if (!player.object) return;
 
-                const lerpFactor = Math.min(5, 10 * frameDelta);
+                const lerpFactor = Math.min(1, 15 * frameDelta);
                 player.object.position.lerp(new THREE.Vector3(player.x, player.y, player.z), lerpFactor);
                 player.object.rotation.y = THREE.MathUtils.lerp(player.object.rotation.y, player.rotationY || 0, lerpFactor);
+                player.object.rotation.x = THREE.MathUtils.lerp(player.object.rotation.x, player.rotationX || 0, lerpFactor);
             });
 
             renderer.render(scene, camera);
@@ -394,6 +406,7 @@ const FPSGame: React.FC = () => {
 
                 if (model) {
                     model.rotation.y = entity.rotationY || 0;
+                    model.rotation.x = entity.rotationX || 0;
                 }
 
                 players.set(sessionId, {
@@ -403,6 +416,7 @@ const FPSGame: React.FC = () => {
                     y: entity.y,
                     z: entity.z,
                     rotationY: entity.rotationY || 0,
+                    rotationX: entity.rotationX || 0,
                     object: model!
                 });
 
@@ -431,6 +445,13 @@ const FPSGame: React.FC = () => {
                     const player = players.get(sessionId);
                     if (player) {
                         player.rotationY = currentRotation;
+                    }
+                });
+
+                callbacks.listen(entity as any, "rotationX", (currentRotation: number) => {
+                    const player = players.get(sessionId);
+                    if (player) {
+                        player.rotationX = currentRotation;
                     }
                 });
             });

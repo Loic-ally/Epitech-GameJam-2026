@@ -16,6 +16,7 @@ export class MyRoom extends Room {
       player.y = message.y;
       player.z = message.z;
       player.rotationY = message.rotationY;
+      player.rotationX = message.rotationX;
 
       this.state.players.set(client.sessionId, player);
     });
@@ -30,6 +31,7 @@ export class MyRoom extends Room {
     player.y = options.y || 5;
     player.z = options.z || 0;
     player.rotationY = 0;
+    player.rotationX = 0;
 
     this.state.players.set(client.sessionId, player);
   }
