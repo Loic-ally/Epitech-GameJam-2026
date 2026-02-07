@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, type FC } from 'react';
+import { useEffect, useRef } from 'react';
 import * as THREE from "three";
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -10,7 +10,6 @@ import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 import { useRoom } from '../hooks/useRoom';
 import { Callbacks } from '@colyseus/sdk';
 import { Player } from '../types/player.type';
-import { resolve } from 'path';
 
 const FPSGame: React.FC = () => {
     const containerRef = useRef<HTMLDivElement>(null);
@@ -286,7 +285,7 @@ const FPSGame: React.FC = () => {
 
         renderer.setAnimationLoop(animate);
 
-        let playersCallback = null;
+        let playersCallback: any | null = null;
 
         if (room) {
             const callbacks = Callbacks.get(room as any) as any;
