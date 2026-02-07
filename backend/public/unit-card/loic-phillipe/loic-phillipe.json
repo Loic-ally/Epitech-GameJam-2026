@@ -5,8 +5,20 @@
     "image": "",
     "rarity": "",
     "type": "Technique",
+    "category": "LOL",
     "bio": "cherchez-le bien ou sa sale face de rat vous laissera pour mort",
     "attributes": ["tek2", "magrehb united", "pas de dodo", "tranquilou", "jungle", "ligue poro", "bébé ouin ouin", "zoo de l'invocateur", "problème mental"],
+    "stats": { "HP": 0, "ATK": 0, "DEF": 0, "Esquive": 0, "Critique": 0 }
+  },
+  {
+    "id": 2,
+    "name": "AU SECOURS!! DES ETRANGERS",
+    "image": "",
+    "rarity": "epique",
+    "type": "Technique",
+    "category": "RACISTE",
+    "bio": "Appelle le GIGN dès qu'il voit un touriste avec une carte. Pour lui, une pizza est une tentative de colonisation italienne",
+    "attributes": ["tek2", "magrehb united", "pas de dodo", "tranquilou", "Parano", "Idéologie bien ancré"],
     "stats": { "HP": 0, "ATK": 0, "DEF": 0, "Esquive": 0, "Critique": 0 }
   }
 ]

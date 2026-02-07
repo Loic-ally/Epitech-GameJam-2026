@@ -5,8 +5,31 @@
     "image": "",
     "rarity": "",
     "type": "Attaquant",
+    "category": "LOL",
     "bio": "lorsque le syndrome du perssonage principale prends le dessus sur le skill",
     "attributes": ["tek3", "bavard", "bdg", "pas de dodo", "aigris", "mid", "rage quit"],
+    "stats": { "HP": 0, "ATK": 0, "DEF": 0, "Esquive": 0, "Critique": 0 }
+  },
+  {
+    "id": 2,
+    "name": "ON EST PLUS CHEZ NOUS",
+    "image": "",
+    "rarity": "rare",
+    "type": "Attaquant",
+    "category": "RACISTE",
+    "bio": "Surveille la rue à la jumelle. Prêt à appeler la police s'il sent une odeur d'épices dans le couloir de l'immeuble.",
+    "attributes": ["tek3", "bavard", "bdg", "pas de dodo", "aigris", "Idéologie bien ancré"],
+    "stats": { "HP": 0, "ATK": 0, "DEF": 0, "Esquive": 0, "Critique": 0 }
+  },
+  {
+    "id": 3,
+    "name": "LE FLAMBEUR",
+    "image": "",
+    "rarity": "rare",
+    "type": "Attaquant",
+    "category": "GAMBLING",
+    "bio": "Convaincu d'être la star de la table, il mise gros pour forcer le destin à le regarder.",
+    "attributes": ["tek3", "bavard", "bdg", "pas de dodo", "aigris", "Club Gambling"],
     "stats": { "HP": 0, "ATK": 0, "DEF": 0, "Esquive": 0, "Critique": 0 }
   }
 ]
