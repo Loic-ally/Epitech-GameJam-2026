@@ -14,4 +14,8 @@ function getCollection<T extends Document = Document>(name: string) {
     return db.collection<T>(name);
 }
 
+if (!db) {
+    await connectToDatabase();
+}
+
 export { connectToDatabase, getCollection };

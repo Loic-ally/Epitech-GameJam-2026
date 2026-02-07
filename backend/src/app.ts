@@ -9,7 +9,7 @@ import {
 import { Lobby } from './rooms/lobby.js';
 import express from 'express';
 import cors from 'cors';
-import { authRouter } from "./auth/auth.routes.js";
+import { authRouter } from "./modules/auth/auth.routes.js";
 import { cardsRouter } from "./cards/cards.routes.js";
 import { summonerRouter } from "./summoner/summoner.routes.js";
 

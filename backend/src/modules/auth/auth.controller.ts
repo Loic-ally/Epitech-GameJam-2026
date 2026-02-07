@@ -10,8 +10,9 @@ export class AuthController {
 
     async register(req: Request, res: Response) {
         try {
+            console.log(req.body);
             const { firstName, lastName, email, password } = req.body;
-            const { accessToken } = await this.authService.register(firstName, lastName, email, password);
+            const { accessToken } = await this.authService.register(firstName, lastName, password, email);
 
             res.cookie('accessToken', accessToken, {
                 httpOnly: true,
@@ -20,6 +21,7 @@ export class AuthController {
             });
             res.status(201).json({ accessToken });
         } catch (error) {
+            console.error(error);
             res.status(500).json({ error: 'Internal server error' });
         }
     }
