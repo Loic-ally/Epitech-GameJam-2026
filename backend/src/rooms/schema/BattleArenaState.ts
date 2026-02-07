@@ -6,5 +6,6 @@ export class BattleArenaState extends Schema {
   @type("number") currentTurn = 0;
   @type("number") currentPlayer = 0;
   @type({ map: { map: "number" } }) playerCards = new MapSchema<MapSchema<number>>();
+  @type({ map: { map: "number" } }) summonersHealth = new MapSchema<MapSchema<number>>();
 
 }

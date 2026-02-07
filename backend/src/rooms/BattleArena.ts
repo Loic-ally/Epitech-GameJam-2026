@@ -4,6 +4,7 @@ import { BattleArenaState } from "./schema/BattleArenaState.js";
 
 const MAX_DRAW_CARDS = 10;
 const MAX_HAND_CARDS = 5;
+const MAX_SUMMONERS = 6;
 
 const fillCards = (playerCards: MapSchema<number>) => {
   while (playerCards.size < MAX_HAND_CARDS) {
@@ -35,6 +36,13 @@ export class BattleArena extends Room<BattleArenaState> {
       this.state.playerCards.set("0", new MapSchema<number>());
       this.state.playerCards.set("1", new MapSchema<number>());
 
+      for (let i = 0; i < 2; i++) {
+        this.state.summonersHealth.set(i.toString(), new MapSchema<number>());
+        for (let j = 0; j < MAX_SUMMONERS; j++) {
+          this.state.summonersHealth.get(i.toString())!.set(j.toString(), 100); // Health at 100 for now (should be fetched with backend)
+        }
+      }
+
       fillCards(this.state.playerCards.get("0")!);
       fillCards(this.state.playerCards.get("1")!);
 
@@ -54,6 +62,23 @@ export class BattleArena extends Room<BattleArenaState> {
       this.state.playerCards.get(this.state.currentPlayer.toString())!.delete(message.cardId);
 
       console.log(`Card ${message.cardId} played by player ${this.state.currentPlayer}`);
+    });
+
+    this.onMessage('attack', (client, message) => {
+      for (let i = 0; i < MAX_SUMMONERS; i++) {
+        if (this.state.summonersHealth.get(this.state.currentPlayer.toString())!.get(i.toString())! <= 0)
+          continue;
+        for (let j = 0; j < MAX_SUMMONERS; j++) {
+          if (this.state.summonersHealth.get((1 - this.state.currentPlayer).toString())!.get(j.toString())! <= 0)
+            continue;
+          const newHealth =
+            this.state.summonersHealth.get((1 - this.state.currentPlayer).toString())!.get(j.toString())! - 20; // Damage at 20 for now (should be fetched with backend)
+          this.state.summonersHealth.get((1 - this.state.currentPlayer).toString())!.set(j.toString(), newHealth);
+          break;
+        }
+      }
+
+      console.log(`Player ${this.state.currentPlayer} attacked player ${1 - this.state.currentPlayer} (${20} damage)`);
     });
   }
 
