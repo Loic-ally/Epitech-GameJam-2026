@@ -1,5 +1,5 @@
 import React, { FormEvent, useMemo, useState } from 'react';
-import { Client, Room } from '@colyseus/sdk';
+import { Client } from '@colyseus/sdk';
 import './App.css';
 import FPSGame from './components/FPSGame';
 import { useRoom } from './hooks/useRoom';
