@@ -2,7 +2,7 @@ import { Room, Client, CloseCode } from "colyseus";
 import { MyRoomState } from "./schema/MyRoomState.js";
 import { Player } from "../types/Player.js";
 
-export class MyRoom extends Room {
+export class Lobby extends Room {
   maxClients = Infinity;
 
   onCreate (options: any) {

@@ -45,7 +45,7 @@ const RoomsPage: React.FC<RoomsPageProps> = ({ user, onLogout }) => {
     setStatus('Connexion au lobby...');
 
     try {
-      const joinedRoom = await client.joinOrCreate('my_room', {
+      const joinedRoom = await client.joinOrCreate('lobby', {
         displayName: userDisplay,
       });
 
@@ -84,7 +84,7 @@ const RoomsPage: React.FC<RoomsPageProps> = ({ user, onLogout }) => {
 
         {room && (
           <div className="room-details">
-            <div><strong>Lobby:</strong> {room.name ?? 'my_room'}</div>
+            <div><strong>Lobby:</strong> {room.name ?? 'lobby'}</div>
             <div><strong>Lobby ID:</strong> {room.roomId}</div>
             <div><strong>Session:</strong> {room.sessionId}</div>
           </div>

@@ -9,14 +9,14 @@ import {
 import express from "express";
 import cors from "cors";
 
-import { MyRoom } from "./rooms/MyRoom.js";
+import { Lobby } from "./rooms/lobby.js";
 import { cardsRouter, cardsApiEndpoints } from "./cards/cards.routes.js";
-import { authRouter, authApiEndpoints } from "./auth/auth.routes.js";
+import { authRouter } from "./modules/auth/auth.routes.js";
 import { summonerRouter, summonerApiEndpoints } from "./summoner/summoner.routes.js";
 
 const server = defineServer({
     rooms: {
-        my_room: defineRoom(MyRoom)
+        my_room: defineRoom(Lobby)
     },
 
     routes: createRouter({

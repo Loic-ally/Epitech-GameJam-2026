@@ -6,22 +6,32 @@ import {
     createRouter,
     createEndpoint,
 } from "colyseus";
-import { MyRoom } from "./rooms/MyRoom.js";
+import { Lobby } from './rooms/lobby.js';
 import express from 'express';
+import cors from 'cors';
+import { authRouter } from "./auth/auth.routes.js";
+import { cardsRouter } from "./cards/cards.routes.js";
+import { summonerRouter } from "./summoner/summoner.routes.js";
 
 const server = defineServer({
     rooms: {
-        my_room: defineRoom(MyRoom)
+        lobby: defineRoom(Lobby)
     },
-
-    routes: createRouter({
-        api_hello: createEndpoint("/api/hello", { method: "GET", }, async (ctx) => {
-            return { message: "Hello World" }
-        })
-    }),
 
     express: (app) => {
         app.use(express.json());
+
+        app.use(cors({
+            origin: [
+                "http://localhost:3001",
+                "http://127.0.0.1:3001",
+            ],
+            credentials: true,
+        }));
+
+        app.use("/auth", authRouter);
+        app.use("/inventory", cardsRouter);
+        app.use("/summoner", summonerRouter);
 
         app.use("/monitor", monitor());
 
