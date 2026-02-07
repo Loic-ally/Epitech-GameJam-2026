@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { AuthSession } from '../types/auth';
+import { AuthSession } from '../types/auth.type';
 
 const SESSION_KEY = 'egj-auth-session';
 

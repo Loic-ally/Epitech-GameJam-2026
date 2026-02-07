@@ -8,10 +8,13 @@ import { OctreeHelper } from 'three/examples/jsm/helpers/OctreeHelper.js';
 import { Capsule } from 'three/examples/jsm/math/Capsule.js';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 import { useRoom } from '../hooks/useRoom';
+import { Callbacks } from '@colyseus/sdk';
+import { Player } from '../types/player.type';
 
 const FPSGame: React.FC = () => {
     const containerRef = useRef<HTMLDivElement>(null);
     const { room } = useRoom();
+    const players = new Map<string, Player>();
 
     useEffect(() => {
         if (!containerRef.current) return;
@@ -74,13 +77,14 @@ const FPSGame: React.FC = () => {
 
         const onKeyDown = (event: KeyboardEvent) => {
             keyStates[event.code] = true;
-            console.log('room: ', room);
-            if (room) {
+            const player = players.get(room?.sessionId as string);
+
+            if (room && player) {
                 room.send("move", {
-                    x: playerVelocity.x,
-                    y: playerVelocity.y,
-                    z: playerVelocity.z
-            });
+                    x: player.x,
+                    y: player.y,
+                    z: player.z
+                });
             }
         };
 
@@ -216,7 +220,7 @@ const FPSGame: React.FC = () => {
                 .onChange(function (value: boolean) {
                     helper.visible = value;
                 });
-            
+
             return () => {
                 gui.destroy();
             }
@@ -247,22 +251,64 @@ const FPSGame: React.FC = () => {
 
         renderer.setAnimationLoop(animate);
 
+        if (room) {
+            const callbacks = Callbacks.get(room);
+
+            callbacks.onAdd("players", (entity, sessionId) => {
+                players.set(sessionId as string, {
+                    id: sessionId as string,
+                    x: (entity as Player).x,
+                    y: (entity as Player).y,
+                    z: (entity as Player).z
+                });
+
+                callbacks.listen(entity, "x", (currentPos,  previousPosition) => {
+                    const player = players.get(sessionId as string);
+
+                    if (player) {
+                        players.set(sessionId as string, {
+                            ...player, x: currentPos as number,
+                        });
+                    }
+                });
+
+                callbacks.listen(entity, "y", (currentPos,  previousPosition) => {
+                    const player = players.get(sessionId as string);
+
+                    if (player) {
+                        players.set(sessionId as string, {
+                            ...player, y: currentPos as number,
+                        });
+                    }
+                });
+
+                callbacks.listen(entity, "z", (currentPos,  previousPosition) => {
+                    const player = players.get(sessionId as string);
+
+                    if (player) {
+                        players.set(sessionId as string, {
+                            ...player, z: currentPos as number,
+                        });
+                    }
+                });
+            });
+        }
+
         return () => {
             renderer.setAnimationLoop(null);
             if (container) {
                 container.removeChild(renderer.domElement);
                 container.removeChild(stats.domElement);
             }
-            
+
             document.removeEventListener('keydown', onKeyDown);
             document.removeEventListener('keyup', onKeyUp);
             container.removeEventListener('mousedown', onMouseDown);
             document.body.removeEventListener('mousemove', onMouseMove);
             window.removeEventListener('resize', onWindowResize);
-            
+
             renderer.dispose();
         };
-
     }, []);
 
     return (
