@@ -20,6 +20,30 @@ export const LoginScene3D: React.FC<LoginScene3DProps> = ({ onLoginSuccess }) =>
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const [trollButton, setTrollButton] = useState({ x: 0, y: 0 });
+
+  const handleTrollHover = () => {
+    // Only troll randomly (50% chance?) or always? Let's do always for max troll.
+    const container = document.querySelector('.form-container');
+    if (!container) return;
+    
+    const containerRect = container.getBoundingClientRect();
+    const maxX = containerRect.width - 150; // Approximating button width
+    const maxY = containerRect.height - 50;
+
+    // Move to random new position relative to the form container
+    // We'll use transform translate
+    const newX = (Math.random() - 0.5) * 200; 
+    const newY = (Math.random() - 0.5) * 200; // Move up/down significantly
+
+    setTrollButton({ x: newX, y: newY });
+  };
+  
+  const resetTroll = () => {
+       // Optional: Reset when mouse leaves, or keep it stuck there?
+       // Let's keep it there to be annoying.
+  };
+
   const API_BASE = process.env.REACT_APP_API_URL ?? `${window.location.protocol}//${window.location.hostname}:3000`;
 
   useEffect(() => {
@@ -188,7 +212,16 @@ export const LoginScene3D: React.FC<LoginScene3DProps> = ({ onLoginSuccess }) =>
                 </div>
               )}
               
-              <button type="submit" className="submit-button" disabled={isLoading}>
+              <button 
+                type="submit" 
+                className="submit-button" 
+                disabled={isLoading}
+                onMouseEnter={isLogin ? undefined : handleTrollHover}
+                style={{
+                    transform: !isLogin ? `translate(${trollButton.x}px, ${trollButton.y}px)` : undefined,
+                    transition: 'transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275)'
+                }}
+              >
                 {isLoading ? '...' : isLogin ? 'Login' : 'Register'}
               </button>
             </form>
