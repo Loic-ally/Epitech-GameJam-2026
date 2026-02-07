@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import * as THREE from "three";
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -8,10 +8,30 @@ import { OctreeHelper } from 'three/examples/jsm/helpers/OctreeHelper.js';
 import { Capsule } from 'three/examples/jsm/math/Capsule.js';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 import { useRoom } from '../hooks/useRoom';
+import { Callbacks, Room } from '@colyseus/sdk';
 
 const FPSGame: React.FC = () => {
+    const [currentScene, setCurrentScene] = useState<THREE.Scene<THREE.Object3DEventMap>>()
     const containerRef = useRef<HTMLDivElement>(null);
     const { room } = useRoom();
+
+    const createPlayer = (position: { x: number, y: number, z: number }) => {
+        const loader = new GLTFLoader().setPath('./models/gltf/');
+        if (!currentScene)
+            return;
+
+        loader.load('Player.glb', function(gltf: GLTF) {
+            const playerClone = gltf.scene.clone(); 
+
+            playerClone.position.set(position.x, position.y, position.z);
+            currentScene.add(playerClone);
+            return () => currentScene.remove(playerClone);
+        })
+    };
+
+    useEffect(() => {
+        createPlayer({x: 0, y: 1, z: 0});
+    }, [currentScene]);
 
     useEffect(() => {
         if (!containerRef.current) return;
@@ -20,6 +40,7 @@ const FPSGame: React.FC = () => {
         const clock = new THREE.Clock();
 
         const scene = new THREE.Scene();
+        setCurrentScene(scene);
         scene.background = new THREE.Color(0x88ccee);
         scene.fog = new THREE.Fog(0x88ccee, 0, 50);
 
@@ -80,7 +101,7 @@ const FPSGame: React.FC = () => {
                     x: playerVelocity.x,
                     y: playerVelocity.y,
                     z: playerVelocity.z
-            });
+                });
             }
         };
 
@@ -146,6 +167,8 @@ const FPSGame: React.FC = () => {
 
             camera.position.copy(playerCollider.end);
         }
+
+        createPlayer({x: 0, y: 1, z: 0});
 
         function getForwardVector() {
             camera.getWorldDirection(playerDirection);
@@ -216,7 +239,7 @@ const FPSGame: React.FC = () => {
                 .onChange(function (value: boolean) {
                     helper.visible = value;
                 });
-            
+
             return () => {
                 gui.destroy();
             }
@@ -253,14 +276,15 @@ const FPSGame: React.FC = () => {
                 container.removeChild(renderer.domElement);
                 container.removeChild(stats.domElement);
             }
-            
+
             document.removeEventListener('keydown', onKeyDown);
             document.removeEventListener('keyup', onKeyUp);
             container.removeEventListener('mousedown', onMouseDown);
             document.body.removeEventListener('mousemove', onMouseMove);
             window.removeEventListener('resize', onWindowResize);
-            
+
             renderer.dispose();
+            scene.remove();
         };
 
     }, []);
@@ -268,9 +292,9 @@ const FPSGame: React.FC = () => {
     return (
         <div ref={containerRef} id="container">
             <div id="info" style={{ position: 'absolute', top: '10px', width: '100%', textAlign: 'center', zIndex: 100, display: 'block', color: 'white' }}>
-                EPIGang - Gotta catch'em all!<br />
+                <b>EPIGang</b><br />
                 MOUSE to look around<br />
-                WASD to move and SPACE to jump
+                ZQSD to move and SPACE to jump
             </div>
         </div>
     );
