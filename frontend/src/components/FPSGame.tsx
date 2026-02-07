@@ -284,7 +284,7 @@ const FPSGame: React.FC = () => {
                     z: (entity as Player).z
                 });
 
-                callbacks.listen(entity, "x", (currentPos,  previousPosition) => {
+                callbacks.listen(entity, "x", (currentPos: number,  previousPosition: number) => {
                     const player = players.get(sessionId as string);
 
                     if (player) {
@@ -294,7 +294,7 @@ const FPSGame: React.FC = () => {
                     }
                 });
 
-                callbacks.listen(entity, "y", (currentPos,  previousPosition) => {
+                callbacks.listen(entity, "y", (currentPos: number,  previousPosition: number) => {
                     const player = players.get(sessionId as string);
 
                     if (player) {
@@ -304,7 +304,7 @@ const FPSGame: React.FC = () => {
                     }
                 });
 
-                callbacks.listen(entity, "z", (currentPos,  previousPosition) => {
+                callbacks.listen(entity, "z", (currentPos: number,  previousPosition: number) => {
                     const player = players.get(sessionId as string);
 
                     if (player) {
