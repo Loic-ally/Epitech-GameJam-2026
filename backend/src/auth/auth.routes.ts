@@ -11,11 +11,21 @@ router.post("/login", loginController);
 export const authApiEndpoints = {
   auth_register: createEndpoint("/api/auth/register", { method: "POST" }, async (ctx) => {
     const { email, password, firstName, lastName } = ctx.request.body || {};
-    return authService.register(email, password, firstName, lastName);
+    try {
+      return await authService.register(email, password, firstName, lastName);
+    } catch (err: any) {
+      ctx.status = 400;
+      return { error: err?.message ?? "Registration failed" };
+    }
   }),
   auth_login: createEndpoint("/api/auth/login", { method: "POST" }, async (ctx) => {
     const { email, password } = ctx.request.body || {};
-    return authService.login(email, password);
+    try {
+      return await authService.login(email, password);
+    } catch (err: any) {
+      ctx.status = 401;
+      return { error: err?.message ?? "Login failed" };
+    }
   }),
 };
 

@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import * as THREE from "three";
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import type { GLTF } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { Octree } from 'three/examples/jsm/math/Octree.js';
 import { OctreeHelper } from 'three/examples/jsm/helpers/OctreeHelper.js';
 import { Capsule } from 'three/examples/jsm/math/Capsule.js';
@@ -67,13 +68,7 @@ const FPSGame: React.FC = () => {
         const playerDirection = new THREE.Vector3();
 
         let playerOnFloor = false;
-        let mouseTime = 0;
-
         const keyStates: { [key: string]: boolean } = {};
-
-        const vector1 = new THREE.Vector3();
-        const vector2 = new THREE.Vector3();
-        const vector3 = new THREE.Vector3();
 
         const onKeyDown = (event: KeyboardEvent) => {
             keyStates[event.code] = true;
@@ -85,7 +80,6 @@ const FPSGame: React.FC = () => {
 
         const onMouseDown = () => {
             document.body.requestPointerLock();
-            mouseTime = performance.now();
         };
 
         const onMouseMove = (event: MouseEvent) => {
@@ -186,12 +180,12 @@ const FPSGame: React.FC = () => {
 
         const loader = new GLTFLoader().setPath('./models/gltf/');
 
-        loader.load('Basic.glb', (gltf) => {
+        loader.load('Basic.glb', (gltf: GLTF) => {
             scene.add(gltf.scene);
 
             worldOctree.fromGraphNode(gltf.scene);
 
-            gltf.scene.traverse(child => {
+            gltf.scene.traverse((child: THREE.Object3D) => {
                 if ((child as THREE.Mesh).isMesh) {
                     child.castShadow = true;
                     child.receiveShadow = true;
@@ -213,7 +207,6 @@ const FPSGame: React.FC = () => {
                     helper.visible = value;
                 });
             
-            // Cleanup gui on unmount
             return () => {
                 gui.destroy();
             }
@@ -244,7 +237,6 @@ const FPSGame: React.FC = () => {
 
         renderer.setAnimationLoop(animate);
 
-        // Cleanup
         return () => {
             renderer.setAnimationLoop(null);
             if (container) {
@@ -258,8 +250,6 @@ const FPSGame: React.FC = () => {
             document.body.removeEventListener('mousemove', onMouseMove);
             window.removeEventListener('resize', onWindowResize);
             
-            // Dispose logic could be more thorough (geometry, materials, etc.)
-            // But basic renderer disposal is handled.
             renderer.dispose();
         };
 
