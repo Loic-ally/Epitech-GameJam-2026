@@ -1,5 +1,6 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import './Animation.css';
+import { startThemeAnimation, ThemeName } from './themeEffects';
 
 /* ── Rarity config ── */
 export type Rarity = 'common' | 'rare' | 'epic' | 'legendary';
@@ -129,19 +130,19 @@ const RARITY_MAP: Record<Rarity, RarityConfig> = {
 /* ── Props ── */
 interface AnimationProps {
   rarity: Rarity;
+  theme?: ThemeName;
   imageSrc: string;
   onDone: () => void;
 }
 
-export default function Animation({ rarity, imageSrc, onDone }: AnimationProps) {
+export default function Animation({ rarity, theme, imageSrc, onDone }: AnimationProps) {
   const config = RARITY_MAP[rarity];
   const [phase, setPhase] = useState<'code' | 'reveal'>('code');
   const [visibleLines, setVisibleLines] = useState(0);
   const [showImage, setShowImage] = useState(false);
   const [imageReady, setImageReady] = useState(false);
-  const [lightnings, setLightnings] = useState<{ id: number; x: number; y: number; color: string }[]>([]);
   const codeRef = useRef<HTMLDivElement>(null);
-  const nextId = useRef(0);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   /* ── Code rain ── */
   useEffect(() => {
@@ -171,33 +172,13 @@ export default function Animation({ rarity, imageSrc, onDone }: AnimationProps) 
     return () => clearTimeout(t);
   }, [phase]);
 
-  /* ── Lightning FX (blue + yellow) ── */
-  const spawnLightning = useCallback(() => {
-    const colors = ['#3b82f6', '#facc15', '#60a5fa', '#fbbf24'];
-    const bolt = {
-      id: nextId.current++,
-      x: Math.random() * 100,
-      y: Math.random() * 100,
-      color: colors[Math.floor(Math.random() * colors.length)],
-    };
-    setLightnings((prev) => [...prev, bolt]);
-    setTimeout(() => {
-      setLightnings((prev) => prev.filter((l) => l.id !== bolt.id));
-    }, 700);
-  }, []);
-
+  /* ── Theme animation FX ── */
   useEffect(() => {
     if (phase !== 'reveal') return;
-    // spawn a few bolts on entry
-    for (let i = 0; i < 6; i++) setTimeout(spawnLightning, i * 120);
-    // then ongoing random bolts
-    const iv = setInterval(spawnLightning, 350);
-    const stop = setTimeout(() => clearInterval(iv), 3500);
-    return () => {
-      clearInterval(iv);
-      clearTimeout(stop);
-    };
-  }, [phase, spawnLightning]);
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    return startThemeAnimation(canvas, theme || 'crack');
+  }, [phase, theme]);
 
   /* ── CODE PHASE ── */
   if (phase === 'code') {
@@ -223,19 +204,8 @@ export default function Animation({ rarity, imageSrc, onDone }: AnimationProps) 
   /* ── REVEAL PHASE ── */
   return (
     <div className={`anim-screen anim-reveal-bg ${config.fxClass}`}>
-      {/* Lightning bolts */}
-      {lightnings.map((bolt) => (
-        <div
-          key={bolt.id}
-          className="lightning-bolt"
-          style={{
-            left: `${bolt.x}%`,
-            top: `${bolt.y}%`,
-            background: `radial-gradient(circle, ${bolt.color}, transparent 70%)`,
-            boxShadow: `0 0 40px 10px ${bolt.color}`,
-          }}
-        />
-      ))}
+      {/* Lightning canvas */}
+      <canvas ref={canvasRef} className="lightning-canvas" />
 
       <div className={`anim-reveal-card ${imageReady ? 'anim-reveal-card--visible' : ''}`}>
         {showImage && (

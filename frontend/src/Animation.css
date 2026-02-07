@@ -143,31 +143,13 @@
    Lightning bolts FX (blue + yellow)
    ══════════════════════════════════ */
 
-.lightning-bolt {
+.lightning-canvas {
   position: absolute;
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   pointer-events: none;
   z-index: 1;
-  opacity: 0;
-  animation: boltFlash 700ms ease-out forwards;
-  mix-blend-mode: screen;
-}
-
-@keyframes boltFlash {
-  0% {
-    transform: scale(0.3);
-    opacity: 1;
-  }
-  40% {
-    transform: scale(1.6);
-    opacity: 0.9;
-  }
-  100% {
-    transform: scale(2.2);
-    opacity: 0;
-  }
 }
 
 /* ══════════════════════════════════
@@ -178,12 +160,6 @@
 .fx-common .anim-reveal-card--visible {
   box-shadow: 0 0 30px rgba(150, 150, 150, 0.2), 0 30px 80px rgba(0, 0, 0, 0.5);
 }
-.fx-common .lightning-bolt {
-  width: 60px;
-  height: 60px;
-  animation-duration: 400ms;
-}
-
 /* Rare – blue tint */
 .fx-rare .anim-reveal-card--visible {
   box-shadow: 0 0 50px rgba(59, 130, 246, 0.4), 0 40px 100px rgba(0, 0, 0, 0.5);
@@ -199,10 +175,6 @@
   box-shadow: 0 0 100px rgba(250, 204, 21, 0.5),
     0 0 200px rgba(59, 130, 246, 0.3),
     0 40px 100px rgba(0, 0, 0, 0.5);
-}
-.fx-legendary .lightning-bolt {
-  width: 180px;
-  height: 180px;
 }
 .fx-legendary::after {
   content: '';
