@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, type FC } from 'react';
 import * as THREE from "three";
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -8,17 +8,21 @@ import { OctreeHelper } from 'three/examples/jsm/helpers/OctreeHelper.js';
 import { Capsule } from 'three/examples/jsm/math/Capsule.js';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 import { useRoom } from '../hooks/useRoom';
-import { Callbacks, Room } from '@colyseus/sdk';
+import { Callbacks } from '@colyseus/sdk';
 import { Player } from '../types/player.type';
 import { resolve } from 'path';
 
 const FPSGame: React.FC = () => {
     const containerRef = useRef<HTMLDivElement>(null);
+    const sceneRef = useRef<THREE.Scene | null>(null);
+    const playersRef = useRef<Map<string, Player>>(new Map());
     const { room } = useRoom();
-    const players = new Map<string, Player>();
 
-    const createPlayer = (scene: THREE.Scene<THREE.Object3DEventMap>, position: { x: number, y: number, z: number }): Promise<THREE.Group<THREE.Object3DEventMap>> => {
+    const createPlayer = useCallback((position: { x: number, y: number, z: number }) => {
         const loader = new GLTFLoader().setPath('./models/gltf/');
+        const scene = sceneRef.current;
+
+        if (!scene) return;
 
         return new Promise((resolve) => {
             loader.load('Player.glb', function(gltf: GLTF) {
@@ -35,10 +39,12 @@ const FPSGame: React.FC = () => {
     useEffect(() => {
         if (!containerRef.current) return;
 
+        const players = playersRef.current;
         const container = containerRef.current;
         const clock = new THREE.Clock();
 
         const scene = new THREE.Scene();
+        sceneRef.current = scene;
         scene.background = new THREE.Color(0x88ccee);
         scene.fog = new THREE.Fog(0x88ccee, 0, 50);
 
@@ -284,50 +290,41 @@ const FPSGame: React.FC = () => {
         renderer.setAnimationLoop(animate);
 
         if (room) {
-            const callbacks = Callbacks.get(room);
+            const callbacks = Callbacks.get(room as any) as any;
 
-            callbacks.onAdd("players", async (entity, sessionId) => {
-                if (players.get(sessionId as string)) {
-                    return;
-                }
-                const player = await createPlayer(scene, {x: (entity as Player).x, y: (entity as Player).y + 2, z: (entity as Player).z});
-
-                players.set(sessionId as string, {
-                    id: sessionId as string,
-                    x: (entity as Player).x,
-                    y: (entity as Player).y,
-                    z: (entity as Player).z,
-                    object: player
+            callbacks.onAdd("players", (entity: Player, sessionId: string) => {
+                players.set(sessionId, {
+                    id: sessionId,
+                    x: entity.x,
+                    y: entity.y,
+                    z: entity.z
                 });
 
-                callbacks.listen(entity, "x", (currentPos: number,  previousPosition: number) => {
-                    const player = players.get(sessionId as string);
+                callbacks.listen(entity as any, "x", (currentPos: number) => {
+                    const player = players.get(sessionId);
 
                     if (player) {
-                        player.object.position.setX(currentPos);
-                        players.set(sessionId as string, {
+                        players.set(sessionId, {
                             ...player, x: currentPos,
                         });
                     }
                 });
 
-                callbacks.listen(entity, "y", (currentPos: number,  previousPosition: number) => {
-                    const player = players.get(sessionId as string);
+                callbacks.listen(entity as any, "y", (currentPos: number) => {
+                    const player = players.get(sessionId);
 
                     if (player) {
-                        player.object.position.setY(currentPos);
-                        players.set(sessionId as string, {
+                        players.set(sessionId, {
                             ...player, y: currentPos,
                         });
                     }
                 });
 
-                callbacks.listen(entity, "z", (currentPos: number,  previousPosition: number) => {
-                    const player = players.get(sessionId as string);
+                callbacks.listen(entity as any, "z", (currentPos: number) => {
+                    const player = players.get(sessionId);
 
                     if (player) {
-                        player.object.position.setZ(currentPos);
-                        players.set(sessionId as string, {
+                        players.set(sessionId, {
                             ...player, z: currentPos,
                         });
                     }
@@ -351,7 +348,7 @@ const FPSGame: React.FC = () => {
             renderer.dispose();
             scene.remove();
         };
-    }, []);
+    }, [createPlayer, room]);
 
     return (
         <div ref={containerRef} id="container">
