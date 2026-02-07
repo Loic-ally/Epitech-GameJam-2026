@@ -1,0 +1,12 @@
+[
+  {
+    "id": 1,
+    "name": "Horrible maitre yi",
+    "image": "",
+    "rarity": "",
+    "type": "Tank",
+    "bio": "Un joueur tellement nul que son équipe jouait LITTERALEMENT en 4v5",
+    "attributes": ["tek1", "lunette", "gourmand", "zesti", "jungle", "nul à lol"],
+    "stats": { "HP": 0, "ATK": 0, "DEF": 0, "Esquive": 0, "Critique": 0 }
+  }
+]

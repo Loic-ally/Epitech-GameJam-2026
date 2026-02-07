@@ -1,0 +1,12 @@
+[
+  {
+    "id": 1,
+    "name": "Singe de l'invocateur",
+    "image": "",
+    "rarity": "",
+    "type": "Technique",
+    "bio": "Un singe malin qui joue un singe...on aura tout vu",
+    "attributes": ["tek2", "maghreb united", "bdg", "bavard", "jungle", "nul à lol", "zoo de l'invocateur"],
+    "stats": { "HP": 0, "ATK": 0, "DEF": 0, "Esquive": 0, "Critique": 0 }
+  }
+]

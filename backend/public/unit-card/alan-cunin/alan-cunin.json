@@ -1,0 +1,12 @@
+[
+  {
+    "id": 1,
+    "name": "Que fais mon support",
+    "image": "",
+    "rarity": "",
+    "type": "Tank",
+    "bio": "Il regarda sans rien pouvoir faire son support se suicider sous la tour ennemie",
+    "attributes": ["tek3", "aer", "coupe de cheveux supecte", "bavard", "adc", "rage quit", "nul à lol", "où est mon Support ?"],
+    "stats": { "HP": 0, "ATK": 0, "DEF": 0, "Esquive": 0, "Critique": 0 }
+  }
+]
