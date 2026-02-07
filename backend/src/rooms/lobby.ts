@@ -2,12 +2,11 @@ import { Room, Client, CloseCode } from "colyseus";
 import { MyRoomState } from "./schema/MyRoomState.js";
 import { Player } from "../types/Player.js";
 
-export class MyRoom extends Room {
+export class Lobby extends Room {
   maxClients = Infinity;
 
   onCreate (options: any) {
     this.state = new MyRoomState();
-    console.log(`MyRoom created with options:`, options);
 
     this.onMessage('move', (client, message) => {
       const player = this.state.players.get(client.sessionId);

@@ -3,25 +3,36 @@ import {
     defineRoom,
     monitor,
     playground,
-    createRouter,
-    createEndpoint,
 } from "colyseus";
-import { MyRoom } from "./rooms/MyRoom.js";
+import { Lobby } from './rooms/Lobby.js';
 import express from 'express';
+import cors from 'cors';
+import { authRouter } from "./modules/auth/auth.routes.js";
+import { inventoryRouter } from "./modules/inventory/inventory.routes.js";
+import { verifyAccess } from "./middlewares/auth.js";
+import { deckRouter } from "./modules/deck/deck.routes.js";
+import { BattleArena } from "./rooms/BattleArena.js";
 
 const server = defineServer({
     rooms: {
-        my_room: defineRoom(MyRoom)
+        lobby: defineRoom(Lobby),
+        battle_arena: defineRoom(BattleArena)
     },
-
-    routes: createRouter({
-        api_hello: createEndpoint("/api/hello", { method: "GET", }, async (ctx) => {
-            return { message: "Hello World" }
-        })
-    }),
 
     express: (app) => {
         app.use(express.json());
+
+        app.use(cors({
+            origin: [
+                "http://localhost:3001",
+                "http://127.0.0.1:3001",
+            ],
+            credentials: true,
+        }));
+
+        app.use("/auth", authRouter);
+        app.use("/inventory", verifyAccess, inventoryRouter);
+        app.use("/deck", verifyAccess, deckRouter);
 
         app.use("/monitor", monitor());
 
