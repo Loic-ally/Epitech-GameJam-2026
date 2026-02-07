@@ -22,7 +22,7 @@ export const ROOMS: RoomRegion[] = [
     {
         id: "AFK",
         name: "Salle AFK",
-        description: "Take a break, you deserve it.",
+        description: "Wanna 1v1 smash bros?",
         minX: 17.52, maxX: 22.65,
         minZ: -3.22, maxZ: 2.0,
         minY: 0.6, maxY: 3.6
@@ -70,31 +70,23 @@ export const ROOMS: RoomRegion[] = [
     {
         id: "TerreDuMilieu",
         name: "Salle Terre du Milieu",
-        description: "Journey through Middle-earth.",
+        description: "Don't let them take the ring.",
         minX: 5.35, maxX: 12.65,
         minZ: -3.65, maxZ: 3.53,
         minY: 0.6, maxY: 3.6
     },
     {
         id: "Bureau",
-        name: "Salle Bureau",
+        name: "Salle du Boss",
         description: "Work, work, work.",
         minX: 4.34, maxX: 16.4,
         minZ: -14.62, maxZ: -7.46,
         minY: 0.6, maxY: 3.6
     },
     {
-        id: "Hyrule",
-        name: "Salle Hyrule",
-        description: "It's dangerous to go alone! Take this.",
-        minX: -4.38, maxX: 2.15,
-        minZ: -3.54, maxZ: 3.54,
-        minY: 0.6, maxY: 3.6
-    },
-    {
         id: "Lumiere",
         name: "Salle Lumière",
-        description: "Everything the light touches.",
+        description: "For those who come after.",
         minX: -5.72, maxX: -0.35,
         minZ: -12.65, maxZ: -7.47,
         minY: 0.6, maxY: 3.6
