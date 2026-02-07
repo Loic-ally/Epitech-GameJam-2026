@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import './App.css';
 import Animation, { type Rarity } from './Animation';
 import GachaPage, { type Banner } from './components/GachaPage';
@@ -27,6 +27,44 @@ function App() {
   const [pull, setPull] = useState<{ banner: Banner; rarity: Rarity; count: 1 | 10 } | null>(null);
 
   const highlightedBanner = useMemo(() => GACHA_BANNERS[0], []);
+
+  useEffect(() => {
+    // Détecte un combo clavier et déclenche une synthèse vocale thématique.
+    const TRIGGER_SEQUENCE = [
+      'ArrowUp', 'ArrowUp', 'ArrowDown', 'ArrowDown', 'ArrowLeft', 'ArrowRight', 'ArrowLeft', 'ArrowRight',
+      'b', 'a', 'Enter',
+    ];
+
+    let position = 0;
+
+    const normalizeKey = (key: string) => (key.length === 1 ? key.toLowerCase() : key);
+
+    const handleKeyDown = (event: KeyboardEvent) => {
+      const target = event.target as HTMLElement | null;
+      if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable)) return;
+
+      const key = normalizeKey(event.key);
+      const expected = normalizeKey(TRIGGER_SEQUENCE[position]);
+
+      if (key === expected) {
+        position += 1;
+        if (position === TRIGGER_SEQUENCE.length) {
+          position = 0;
+
+          const utterance = new SpeechSynthesisUtterance('al-hayat media center, presents: the gacha simulator');
+          utterance.lang = 'en-US';
+          utterance.rate = 0.95;
+          window.speechSynthesis.cancel();
+          window.speechSynthesis.speak(utterance);
+        }
+      } else {
+        position = key === normalizeKey(TRIGGER_SEQUENCE[0]) ? 1 : 0;
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, []);
 
   const handlePull = useCallback((banner: Banner, count: 1 | 10) => {
     const rarity = pickRarity(banner, count);
