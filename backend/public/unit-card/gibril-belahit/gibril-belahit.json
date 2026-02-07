@@ -1,0 +1,13 @@
+[
+  {
+    "id": 1,
+    "name": "0/10 Nunu",
+    "image": "",
+    "rarity": "",
+    "type": "Tank",
+    "category": "LOL",
+    "bio": "à première vu on pourrais croire qu'il troll...mais je vous assure qu'il fait de son mieux",
+    "attributes": ["tek2", "magrehb united", "malicieux", "tranquilou", "jungle", "ligue poro", "nul à lol", "0/10 Power Spike"],
+    "stats": { "HP": 0, "ATK": 0, "DEF": 0, "Esquive": 0, "Critique": 0 }
+  }
+]

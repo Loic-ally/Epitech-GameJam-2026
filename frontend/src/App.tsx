@@ -3,6 +3,10 @@ import './App.css';
 import Animation, { type Rarity } from './Animation';
 import GachaPage, { type Banner } from './components/GachaPage';
 import { GACHA_BANNERS } from './data/banners';
+import AuthPage from './pages/AuthPage';
+import RoomsPage from './pages/RoomsPage';
+import { RoomProvider } from './context/RoomContext';
+import { useAuthSession } from './hooks/useAuthSession';
 
 function pickRarity(banner: Banner, count: 1 | 10): Rarity {
   const order: Rarity[] = ['common', 'rare', 'epic', 'legendary'];
@@ -130,6 +134,16 @@ function App() {
         />
       )}
     </div>
+  const { session, authenticate, logout } = useAuthSession();
+
+  return (
+    <RoomProvider>
+      {session ? (
+        <RoomsPage user={session.user} onLogout={logout} />
+      ) : (
+        <AuthPage onAuthenticated={authenticate} />
+      )}
+    </RoomProvider>
   );
 }
 
