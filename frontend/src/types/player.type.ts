@@ -6,6 +6,7 @@ export interface Player {
     x: number;
     y: number;
     z: number;
+    rotationY?: number;
     object: THREE.Group<THREE.Object3DEventMap>;
     label?: THREE.Sprite;
 }

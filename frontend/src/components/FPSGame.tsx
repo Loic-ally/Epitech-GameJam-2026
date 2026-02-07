@@ -60,6 +60,18 @@ const FPSGame: React.FC = () => {
                     }
                 }
 
+                const randomColor = new THREE.Color(Math.random(), Math.random(), Math.random());
+
+                gltf.scene.traverse((child) => {
+                    if (child instanceof THREE.Mesh) {
+                        const color = (child.material as THREE.MeshStandardMaterial).color;
+
+                        if (color.r > 0.5 && color.g > 0.5 && color.b > 0.5) {
+                            (child.material as THREE.MeshStandardMaterial).color.set(randomColor);
+                        }
+                    }
+                });
+
                 scene.add(playerClone);
                 resolve(playerClone);
             })
@@ -144,7 +156,8 @@ const FPSGame: React.FC = () => {
                 room.send("move", {
                     x: player.x,
                     y: player.y,
-                    z: player.z
+                    z: player.z,
+                    rotationY: camera.rotation.y
                 });
             }
         };
@@ -341,7 +354,8 @@ const FPSGame: React.FC = () => {
         }
 
         function animate() {
-            const deltaTime = Math.min(0.05, clock.getDelta()) / STEPS_PER_FRAME;
+            const frameDelta = clock.getDelta();
+            const deltaTime = Math.min(0.05, frameDelta) / STEPS_PER_FRAME;
 
             for (let i = 0; i < STEPS_PER_FRAME; i++) {
                 controls(deltaTime);
@@ -349,6 +363,15 @@ const FPSGame: React.FC = () => {
                 teleportPlayerIfOob();
                 checkRoomRegion();
             }
+
+            players.forEach((player, sessionId) => {
+                if (sessionId === room?.sessionId) return;
+                if (!player.object) return;
+
+                const lerpFactor = Math.min(5, 10 * frameDelta);
+                player.object.position.lerp(new THREE.Vector3(player.x, player.y, player.z), lerpFactor);
+                player.object.rotation.y = THREE.MathUtils.lerp(player.object.rotation.y, player.rotationY || 0, lerpFactor);
+            });
 
             renderer.render(scene, camera);
             stats.update();
@@ -369,45 +392,45 @@ const FPSGame: React.FC = () => {
                 const isLocal = sessionId === room.sessionId;
                 const model = await createPlayerModel(scene, { x: entity.x, y: entity.y, z: entity.z }, entity.displayName, isLocal);
 
+                if (model) {
+                    model.rotation.y = entity.rotationY || 0;
+                }
+
                 players.set(sessionId, {
                     id: sessionId,
                     displayName: entity.displayName,
                     x: entity.x,
                     y: entity.y,
                     z: entity.z,
+                    rotationY: entity.rotationY || 0,
                     object: model!
                 });
 
                 callbacks.listen(entity as any, "x", (currentPos: number) => {
                     const player = players.get(sessionId);
                     if (player) {
-                        if (sessionId !== room.sessionId) {
-                            console.log("x pos", currentPos);
-                        }
-                        player.object.position.setX(currentPos);
-                        players.set(sessionId, {
-                            ...player, x: currentPos,
-                        });
+                        player.x = currentPos;
                     }
                 });
 
                 callbacks.listen(entity as any, "y", (currentPos: number) => {
                     const player = players.get(sessionId);
                     if (player) {
-                        player.object.position.setY(currentPos);
-                        players.set(sessionId, {
-                            ...player, y: currentPos,
-                        });
+                        player.y = currentPos;
                     }
                 });
 
                 callbacks.listen(entity as any, "z", (currentPos: number) => {
                     const player = players.get(sessionId);
                     if (player) {
-                        player.object.position.setZ(currentPos);
-                        players.set(sessionId, {
-                            ...player, z: currentPos,
-                        });
+                        player.z = currentPos;
+                    }
+                });
+
+                callbacks.listen(entity as any, "rotationY", (currentRotation: number) => {
+                    const player = players.get(sessionId);
+                    if (player) {
+                        player.rotationY = currentRotation;
                     }
                 });
             });
