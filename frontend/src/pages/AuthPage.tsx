@@ -1,7 +1,7 @@
 import React, { FormEvent, useState } from 'react';
 import '../App.css';
 import { AuthForm } from '../components/AuthForm';
-import { AuthSession } from '../types/auth';
+import { AuthSession } from '../types/auth.type';
 
 type Mode = 'login' | 'register';
 

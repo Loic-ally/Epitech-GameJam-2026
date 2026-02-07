@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useRef, useState } from 'react';
 import '../App.css';
 import { LobbyPanel } from '../components/LobbyPanel';
 import { StatusPanel } from '../components/StatusPanel';
-import { AuthUser } from '../types/auth';
+import { AuthUser } from '../types/auth.type';
 import { useRoom } from '../hooks/useRoom';
 import { Client, Room } from '@colyseus/sdk';
 import FPSGame from '../components/FPSGame';
