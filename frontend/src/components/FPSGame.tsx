@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useRef, type FC } from 'react';
+import { useCallback, useEffect, useRef, useState, type FC } from 'react';
 import * as THREE from "three";
 import Stats from 'three/examples/jsm/libs/stats.module.js';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
@@ -10,12 +10,20 @@ import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
 import { useRoom } from '../hooks/useRoom';
 import { Callbacks } from '@colyseus/sdk';
 import { Player } from '../types/player.type';
+import { ROOMS, RoomRegion } from '../config/rooms.config';
+
+interface TriggerZone {
+    box: THREE.Box3;
+    onEnter: () => void;
+    name: string;
+}
 
 const FPSGame: FC = () => {
     const containerRef = useRef<HTMLDivElement>(null);
     const sceneRef = useRef<THREE.Scene | null>(null);
     const playersRef = useRef<Map<string, Player>>(new Map());
     const { room } = useRoom();
+    const [currentRoom, setCurrentRoom] = useState<RoomRegion | null>(null);
 
     const createPlayer = useCallback((position: { x: number, y: number, z: number }) => {
         const loader = new GLTFLoader().setPath('./models/gltf/');
@@ -79,13 +87,40 @@ const FPSGame: FC = () => {
         stats.domElement.style.top = '0px';
         container.appendChild(stats.domElement);
 
-        const GRAVITY = 30;
+        const GRAVITY = 20;
 
         const STEPS_PER_FRAME = 5;
 
         const worldOctree = new Octree();
+        const triggers: TriggerZone[] = [];
+
+        const triggerMesh = new THREE.Mesh(
+            new THREE.BoxGeometry(2, 2, 2),
+            new THREE.MeshStandardMaterial({ color: 0x00ff00, wireframe: true, transparent: true, opacity: 0.5 })
+        );
+        triggerMesh.position.set(5, 1, 5);
+        scene.add(triggerMesh);
+
+        triggers.push({
+            name: 'example',
+            box: new THREE.Box3().setFromObject(triggerMesh),
+            onEnter: () => {
+                console.log('Player entered trigger zone!');
+                triggerMesh.material.color.set(0xff0000);
+            }
+        });
 
         const playerCollider = new Capsule(new THREE.Vector3(0, 0.35, 0), new THREE.Vector3(0, 1, 0), 0.35);
+
+        // Fixed Spawn Point
+        const spawnPos = { x: 1.7, y: 0.7, z: -9.97 };
+        
+        const setSpawn = (pos: { x: number, y: number, z: number }) => {
+            playerCollider.start.set(pos.x, pos.y, pos.z);
+            playerCollider.end.set(pos.x, pos.y + 0.65, pos.z);
+        };
+
+        setSpawn(spawnPos);
 
         const playerVelocity = new THREE.Vector3();
         const playerDirection = new THREE.Vector3();
@@ -163,13 +198,14 @@ const FPSGame: FC = () => {
 
             const deltaPosition = playerVelocity.clone().multiplyScalar(deltaTime);
             playerCollider.translate(deltaPosition);
+            console.log("Player Pos:", playerCollider.end.x, playerCollider.end.y, playerCollider.end.z);
 
             playerCollisions();
 
             camera.position.copy(playerCollider.end);
         }
 
-        createPlayer({x: 0, y: 1, z: 0});
+        createPlayer(spawnPos);
 
         function getForwardVector() {
             camera.getWorldDirection(playerDirection);
@@ -248,11 +284,47 @@ const FPSGame: FC = () => {
 
         function teleportPlayerIfOob() {
             if (camera.position.y <= -25) {
-                playerCollider.start.set(0, 0.35, 0);
-                playerCollider.end.set(0, 1, 0);
-                playerCollider.radius = 0.35;
+                setSpawn(spawnPos);
                 camera.position.copy(playerCollider.end);
                 camera.rotation.set(0, 0, 0);
+                if (room) {
+                    room.send("move", spawnPos);
+                }
+            }
+        }
+
+        const triggeredStates = new Set<string>();
+        let localCurrentRoomId: string | null = null;
+
+        function checkRoomRegion() {
+            const pos = playerCollider.end;
+            let foundRoom: RoomRegion | null = null;
+
+            for (const r of ROOMS) {
+                if (pos.x >= r.minX && pos.x <= r.maxX &&
+                    pos.z >= r.minZ && pos.z <= r.maxZ &&
+                    pos.y >= r.minY && pos.y <= r.maxY) {
+                    foundRoom = r;
+                    break;
+                }
+            }
+
+            if ((foundRoom?.id || null) !== localCurrentRoomId) {
+                localCurrentRoomId = foundRoom?.id || null;
+                setCurrentRoom(foundRoom);
+            }
+        }
+
+        function checkTriggers() {
+            for (const trigger of triggers) {
+                if (playerCollider.intersectsBox(trigger.box)) {
+                    if (!triggeredStates.has(trigger.name)) {
+                        trigger.onEnter();
+                        triggeredStates.add(trigger.name);
+                    }
+                } else {
+                    triggeredStates.delete(trigger.name);
+                }
             }
         }
 
@@ -263,6 +335,8 @@ const FPSGame: FC = () => {
                 controls(deltaTime);
                 updatePlayer(deltaTime);
                 teleportPlayerIfOob();
+                checkTriggers();
+                checkRoomRegion();
             }
 
             renderer.render(scene, camera);
@@ -338,6 +412,12 @@ const FPSGame: FC = () => {
                 <b>EPIGang</b><br />
                 MOUSE to look around<br />
                 ZQSD to move and SPACE to jump
+                {currentRoom && (
+                    <div style={{ marginTop: '10px', padding: '10px', backgroundColor: 'rgba(0,0,0,0.5)', borderRadius: '5px' }}>
+                        <div style={{ fontSize: '1.2em', fontWeight: 'bold' }}>{currentRoom.name}</div>
+                        <div style={{ fontSize: '0.9em', fontStyle: 'italic' }}>{currentRoom.description}</div>
+                    </div>
+                )}
             </div>
         </div>
     );
