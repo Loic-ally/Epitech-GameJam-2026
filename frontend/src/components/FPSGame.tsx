@@ -7,9 +7,11 @@ import { Octree } from 'three/examples/jsm/math/Octree.js';
 import { OctreeHelper } from 'three/examples/jsm/helpers/OctreeHelper.js';
 import { Capsule } from 'three/examples/jsm/math/Capsule.js';
 import { GUI } from 'three/examples/jsm/libs/lil-gui.module.min.js';
+import { useRoom } from '../hooks/useRoom';
 
 const FPSGame: React.FC = () => {
     const containerRef = useRef<HTMLDivElement>(null);
+    const { room } = useRoom();
 
     useEffect(() => {
         if (!containerRef.current) return;
@@ -72,6 +74,14 @@ const FPSGame: React.FC = () => {
 
         const onKeyDown = (event: KeyboardEvent) => {
             keyStates[event.code] = true;
+            console.log('room: ', room);
+            if (room) {
+                room.send("move", {
+                    x: playerVelocity.x,
+                    y: playerVelocity.y,
+                    z: playerVelocity.z
+            });
+            }
         };
 
         const onKeyUp = (event: KeyboardEvent) => {
@@ -173,7 +183,7 @@ const FPSGame: React.FC = () => {
 
             if (playerOnFloor) {
                 if (keyStates['Space']) {
-                    playerVelocity.y = 15;
+                    playerVelocity.y = 10;
                 }
             }
         }
@@ -258,8 +268,8 @@ const FPSGame: React.FC = () => {
     return (
         <div ref={containerRef} id="container">
             <div id="info" style={{ position: 'absolute', top: '10px', width: '100%', textAlign: 'center', zIndex: 100, display: 'block', color: 'white' }}>
-                Octree threejs demo - basic collisions with static triangle mesh<br />
-                MOUSE to look around and to throw balls<br />
+                EPIGang - Gotta catch'em all!<br />
+                MOUSE to look around<br />
                 WASD to move and SPACE to jump
             </div>
         </div>
