@@ -68,7 +68,7 @@
       "type": "stat_boost_conditional",
       "target": "condition",
       "condition": {
-        "attribute": "magrehb united"
+        "attribute": "maghreb united"
       },
       "stats": [
         {"stat": "HP", "value": 30, "unit": "percent"},
@@ -248,7 +248,7 @@
       "type": "stat_boost_conditional_multiple",
       "target": "condition",
       "conditions": [
-        {"attribute": "magrehb united"},
+        {"attribute": "maghreb united"},
         {"attribute": "vieux"}
       ],
       "stats": [
@@ -383,7 +383,7 @@
     "id": 25,
     "name": "Romain HANSER",
     "rarity": "commune",
-    "promo": "tek3",
+    "promo": "fantome",
     "image": "romain.hanser.jpg",
     "leader_skill": {
       "type": "special_evasion",
