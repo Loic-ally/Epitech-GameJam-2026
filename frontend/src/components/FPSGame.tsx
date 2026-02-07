@@ -18,7 +18,7 @@ interface TriggerZone {
     name: string;
 }
 
-const FPSGame: FC = () => {
+const FPSGame: React.FC = () => {
     const containerRef = useRef<HTMLDivElement>(null);
     const sceneRef = useRef<THREE.Scene | null>(null);
     const playersRef = useRef<Map<string, Player>>(new Map());
@@ -31,14 +31,17 @@ const FPSGame: FC = () => {
 
         if (!scene) return;
 
-        loader.load('Player.glb', function(gltf: GLTF) {
-            const playerClone = gltf.scene.clone(); 
+        return new Promise((resolve) => {
+            loader.load('Player.glb', function(gltf: GLTF) {
+                const playerClone = gltf.scene.clone();
 
-            playerClone.position.set(position.x, position.y, position.z);
-            scene.add(playerClone);
-            return () => scene.remove(playerClone);
+                playerClone.position.set(position.x, position.y, position.z);
+                scene.add(playerClone);
+
+                resolve(playerClone);
+            })
         });
-    }, []);
+    };
 
     useEffect(() => {
         if (!containerRef.current) return;
@@ -54,6 +57,7 @@ const FPSGame: FC = () => {
 
         const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 1000);
         camera.rotation.order = 'YXZ';
+        camera.rotation.y = Math.PI;
 
         const fillLight1 = new THREE.HemisphereLight(0x8dc1de, 0x00668d, 1.5);
         fillLight1.position.set(2, 1, 1);
@@ -128,8 +132,7 @@ const FPSGame: FC = () => {
         let playerOnFloor = false;
         const keyStates: { [key: string]: boolean } = {};
 
-        const onKeyDown = (event: KeyboardEvent) => {
-            keyStates[event.code] = true;
+        const sendMovement = () => {
             const player = players.get(room?.sessionId as string);
 
             if (room && player) {
@@ -139,6 +142,10 @@ const FPSGame: FC = () => {
                     z: player.z
                 });
             }
+        };
+
+        const onKeyDown = (event: KeyboardEvent) => {
+            keyStates[event.code] = true;
         };
 
         const onKeyUp = (event: KeyboardEvent) => {
@@ -188,6 +195,7 @@ const FPSGame: FC = () => {
 
         function updatePlayer(deltaTime: number) {
             let damping = Math.exp(-4 * deltaTime) - 1;
+            const player = players.get(room?.sessionId as string);
 
             if (!playerOnFloor) {
                 playerVelocity.y -= GRAVITY * deltaTime;
@@ -202,10 +210,22 @@ const FPSGame: FC = () => {
 
             playerCollisions();
 
+            if (player) {
+                players.set(room?.sessionId as string, {
+                    ...player,
+                    x: playerCollider.end.x,
+                    y: playerCollider.end.y,
+                    z: playerCollider.end.z,
+                });
+                player?.object.position.set(playerCollider.end.x, playerCollider.end.y, playerCollider.end.z);
+            }
+
+            sendMovement();
+
             camera.position.copy(playerCollider.end);
         }
 
-        createPlayer(spawnPos);
+        createPlayer({x: 0, y: 1, z: 0});
 
         function getForwardVector() {
             camera.getWorldDirection(playerDirection);
@@ -286,7 +306,7 @@ const FPSGame: FC = () => {
             if (camera.position.y <= -25) {
                 setSpawn(spawnPos);
                 camera.position.copy(playerCollider.end);
-                camera.rotation.set(0, 0, 0);
+                camera.rotation.set(0, Math.PI, 0);
                 if (room) {
                     room.send("move", spawnPos);
                 }
