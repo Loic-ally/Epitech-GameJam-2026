@@ -183,7 +183,7 @@ const FPSGame: React.FC = () => {
 
             if (playerOnFloor) {
                 if (keyStates['Space']) {
-                    playerVelocity.y = 15;
+                    playerVelocity.y = 10;
                 }
             }
         }

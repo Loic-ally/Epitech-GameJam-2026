@@ -5,6 +5,7 @@ import { StatusPanel } from '../components/StatusPanel';
 import { AuthUser } from '../types/auth';
 import { useRoom } from '../hooks/useRoom';
 import { Client, Room } from '@colyseus/sdk';
+import FPSGame from '../components/FPSGame';
 
 export interface RoomsPageProps {
   user: AuthUser;
@@ -37,7 +38,7 @@ const RoomsPage: React.FC<RoomsPageProps> = ({ user, onLogout }) => {
 
   const handleJoinLobby = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (room) return;
+    if (room) return <FPSGame/>;
 
     setIsJoining(true);
     setError(null);
@@ -65,6 +66,8 @@ const RoomsPage: React.FC<RoomsPageProps> = ({ user, onLogout }) => {
     }
   };
 
+  if (room)
+    return <FPSGame />
   return (
     <div className="app">
       <div className="card">
