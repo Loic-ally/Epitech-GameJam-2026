@@ -9,7 +9,7 @@ const fillCards = (playerCards: MapSchema<number>) => {
   let newCardIdx = playerCards.size;
   let newCardValue = Math.floor(Math.random() * MAX_DRAW_CARDS);
 
-  while (playerCards.has(newCardValue.toString()) || playerCards.size >= MAX_HAND_CARDS) {
+  while (playerCards.has(newCardValue.toString()) || playerCards.size < MAX_HAND_CARDS) {
     if (playerCards.has(newCardValue.toString()))
       continue;
     playerCards.set(newCardIdx.toString(), newCardValue);
@@ -33,8 +33,8 @@ export class BattleArena extends Room<BattleArenaState> {
         return;
       }
 
-      this.state.currentTurn.set(1);
-      this.state.currentPlayer.set(Math.random() < 0.5 ? 0 : 1);
+      this.state.currentTurn = 1;
+      this.state.currentPlayer = Math.random() < 0.5 ? 0 : 1;
 
       this.state.playerCards.clear();
 
@@ -45,8 +45,8 @@ export class BattleArena extends Room<BattleArenaState> {
     });
 
     this.onMessage('newTurn', (client, message) => {
-      this.state.currentTurn.set(this.state.currentTurn + 1);
-      this.state.currentPlayer.set(this.state.currentPlayer === 0 ? 1 : 0);
+      this.state.currentTurn = this.state.currentTurn + 1;
+      this.state.currentPlayer = this.state.currentPlayer === 0 ? 1 : 0;
 
       fillCards(this.state.playerCards[this.state.currentPlayer]);
 
