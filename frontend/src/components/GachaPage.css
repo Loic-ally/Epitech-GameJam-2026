@@ -194,6 +194,65 @@
   opacity: 0.15;
 }
 
+.fx-holo {
+  position: absolute;
+  inset: -12%;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.14), rgba(180,110,255,0.12), rgba(24,211,197,0.14), rgba(255,200,87,0.14)),
+    conic-gradient(from 0deg at 50% 50%, rgba(255,255,255,0.08), rgba(0,0,0,0));
+  background-size: 200% 200%, 100% 100%;
+  mix-blend-mode: screen;
+  animation: holoShift 4s ease-in-out infinite alternate;
+  opacity: 0.4;
+  filter: blur(8px);
+}
+
+.fx-rings {
+  position: absolute;
+  inset: -18%;
+  background:
+    radial-gradient(circle at 50% 50%, rgba(255,255,255,0.2) 0 12%, transparent 40%),
+    conic-gradient(from 0deg at 50% 50%, rgba(255,255,255,0.08), rgba(255,200,87,0.12), rgba(24,211,197,0.12), rgba(180,110,255,0.1), rgba(255,255,255,0.08));
+  mix-blend-mode: screen;
+  animation: ringsPulse 3.2s ease-in-out infinite;
+  opacity: 0.45;
+  filter: blur(6px);
+}
+
+.fx-lightgrid {
+  position: absolute;
+  inset: -12%;
+  background:
+    repeating-linear-gradient(90deg, rgba(255,255,255,0.06) 0 1px, transparent 1px 10px),
+    repeating-linear-gradient(0deg, rgba(24,211,197,0.06) 0 1px, transparent 1px 12px);
+  mix-blend-mode: screen;
+  animation: lightGridMove 5s linear infinite;
+  opacity: 0.22;
+  filter: blur(3px);
+}
+
+.fx-lensflare {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(circle at 20% 30%, rgba(255,255,255,0.32) 0 8%, transparent 18%),
+    radial-gradient(circle at 60% 55%, rgba(255,200,87,0.28) 0 10%, transparent 22%),
+    radial-gradient(circle at 80% 20%, rgba(24,211,197,0.28) 0 7%, transparent 18%);
+  mix-blend-mode: screen;
+  animation: lensFlareDrift 6s ease-in-out infinite;
+  opacity: 0.4;
+  filter: blur(4px);
+}
+
+.fx-tiltshift {
+  position: absolute;
+  inset: -6%;
+  background:
+    linear-gradient(180deg, rgba(0,0,0,0.35), transparent 35%, transparent 65%, rgba(0,0,0,0.35));
+  mix-blend-mode: multiply;
+  opacity: 0.4;
+}
+
 .gacha-overlay::after {
   content: '';
   position: absolute;
@@ -897,6 +956,29 @@
   0% { opacity: 0.12; }
   50% { opacity: 0.22; }
   100% { opacity: 0.12; }
+}
+
+@keyframes holoShift {
+  0% { background-position: 0% 50%, 50% 50%; filter: hue-rotate(0deg); }
+  50% { background-position: 50% 0%, 60% 60%; filter: hue-rotate(24deg); }
+  100% { background-position: 100% 50%, 70% 40%; filter: hue-rotate(-18deg); }
+}
+
+@keyframes ringsPulse {
+  0% { transform: scale(0.96) rotate(0deg); opacity: 0.4; }
+  50% { transform: scale(1.06) rotate(18deg); opacity: 0.65; }
+  100% { transform: scale(0.98) rotate(36deg); opacity: 0.5; }
+}
+
+@keyframes lightGridMove {
+  0% { background-position: 0 0, 0 0; }
+  100% { background-position: 20px -20px, -20px 20px; }
+}
+
+@keyframes lensFlareDrift {
+  0% { transform: translate(0,0) scale(1); opacity: 0.35; }
+  50% { transform: translate(6px,-6px) scale(1.06); opacity: 0.6; }
+  100% { transform: translate(-6px,6px) scale(1); opacity: 0.4; }
 }
 
 @keyframes scanLines {

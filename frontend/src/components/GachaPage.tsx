@@ -88,6 +88,11 @@ export default function GachaPage({ banners, onClose, onPull }: Props) {
         <div className="fx-scanlines-2" />
         <div className="fx-bokeh" />
         <div className="fx-speckles" />
+        <div className="fx-holo" />
+        <div className="fx-rings" />
+        <div className="fx-lightgrid" />
+        <div className="fx-lensflare" />
+        <div className="fx-tiltshift" />
       </div>
       <div className={`gacha-panel theme-${selected?.id ?? 'default'}`}>
         <div className={`gacha-bg theme-${selected?.id ?? 'default'}`} aria-hidden />
