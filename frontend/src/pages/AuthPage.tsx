@@ -101,8 +101,8 @@ const AuthPage: React.FC<AuthPageProps> = ({ onAuthenticated }) => {
           className="card" 
           style={{
             opacity: isFormVisible ? 1 : 0,
-            transform: isFormVisible ? 'translateY(0)' : 'translateY(20px)',
-            transition: 'opacity 0.8s ease, transform 0.8s ease',
+            transform: isFormVisible ? 'translateY(0) scale(1)' : 'translateY(100px) scale(0.9)',
+            transition: 'opacity 0.6s ease-out, transform 0.8s cubic-bezier(0.34, 1.56, 0.64, 1)',
             pointerEvents: isFormVisible ? 'auto' : 'none',
           }}
         >
