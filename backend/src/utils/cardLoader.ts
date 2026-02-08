@@ -86,9 +86,21 @@ export function loadAllUnitCards(): UnitCardData[] {
           const content = fs.readFileSync(cardFile, 'utf-8');
           const cards = JSON.parse(content);
           if (Array.isArray(cards)) {
+            // Scan for image files in the folder
+            const dirFiles = fs.readdirSync(path.join(cardsDir, entry.name));
+            const imageFiles = dirFiles.filter((f: string) => /\.(jpg|jpeg|png|webp)$/i.test(f));
+
             for (const card of cards) {
               if (card && typeof card.id === 'number') {
                 card.id = makeUnitId(entry.name, card.id, usedIds);
+              }
+              // Assign image based on category match if missing
+              if ((!card.image || card.image === '') && card.category) {
+                const catLower = card.category.toLowerCase();
+                const match = imageFiles.find((f: string) => f.toLowerCase().includes(catLower));
+                if (match) {
+                  card.image = `${entry.name}/${match}`;
+                }
               }
               allCards.push(card);
             }

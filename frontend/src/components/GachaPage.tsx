@@ -24,7 +24,7 @@ export interface Banner {
 interface Props {
   banners: Banner[];
   onClose: () => void;
-  onPull?: (banner: Banner, count: 1 | 10) => void;
+  onPull?: (banner: Banner, count: 1 | 10) => void | Promise<void>;
 }
 
 const rarityLabel: Record<Rarity, string> = {

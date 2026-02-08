@@ -3,23 +3,28 @@ import '../App.css';
 import Animation, { type Rarity } from '../Animation';
 import GachaPage, { type Banner } from '../components/GachaPage';
 import { GACHA_BANNERS } from '../data/banners';
+import { pullGacha } from '../api/gacha';
 
-function pickRarity(banner: Banner, count: 1 | 10): Rarity {
-  const order: Rarity[] = ['common', 'rare', 'epic', 'legendary'];
-  const roll = Math.random() * 100;
-  let cursor = 0;
-  let picked: Rarity = 'common';
+const API_BASE = (typeof window !== 'undefined'
+  ? (process.env.REACT_APP_API_URL ?? `${window.location.protocol}//${window.location.hostname}:3000/api`)
+  : '');
 
-  for (const key of order) {
-    cursor += banner.dropRates[key];
-    if (roll <= cursor) {
-      picked = key;
-      break;
-    }
+function normalizeRarity(raw: string): Rarity {
+  const v = raw.toLowerCase();
+  if (v === 'commune' || v === 'common') return 'common';
+  if (v === 'rare') return 'rare';
+  if (v === 'epique' || v === 'epic') return 'epic';
+  if (v === 'legendaire' || v === 'legendary') return 'legendary';
+  return 'common';
+}
+
+function buildCardImageUrl(card: { image?: string; cardType?: string }): string {
+  if (!card.image) return '';
+  const assetBase = API_BASE.replace(/\/api$/, '');
+  if (card.cardType === 'summoner') {
+    return `${assetBase}/invocator-card/${card.image}`;
   }
-
-  if (count === 10 && picked === 'common') return 'rare';
-  return picked;
+  return `${assetBase}/unit-card/${card.image}`;
 }
 
 const TRIGGER_SEQUENCE = [
@@ -35,7 +40,7 @@ type Props = {
 
 function GachaHub({ startOpen = false }: Props) {
   const [gachaOpen, setGachaOpen] = useState(startOpen);
-  const [pull, setPull] = useState<{ banner: Banner; rarity: Rarity; count: 1 | 10 } | null>(null);
+  const [pull, setPull] = useState<{ banner: Banner; rarity: Rarity; count: 1 | 10; image: string } | null>(null);
 
   const highlightedBanner = useMemo(() => GACHA_BANNERS[0], []);
 
@@ -69,9 +74,21 @@ function GachaHub({ startOpen = false }: Props) {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, []);
 
-  const handlePull = useCallback((banner: Banner, count: 1 | 10) => {
-    const rarity = pickRarity(banner, count);
-    setPull({ banner, rarity, count });
+  const handlePull = useCallback(async (banner: Banner, count: 1 | 10) => {
+    const saved = localStorage.getItem('egj-auth-session');
+    if (!saved) { alert('Connecte-toi pour tirer des cartes.'); return; }
+    const session = JSON.parse(saved);
+    if (!session?.token) { alert('Session invalide, reconnecte-toi.'); return; }
+
+    try {
+      const data = await pullGacha(session.token, count);
+      const first = data.pulls[0];
+      const rarity = normalizeRarity(first?.rarity || 'common');
+      const image = first ? buildCardImageUrl(first) : banner.image;
+      setPull({ banner, rarity, count, image });
+    } catch (err: any) {
+      alert(err?.message || 'Erreur pendant le pull');
+    }
   }, []);
 
   const closeAnimation = useCallback(() => setPull(null), []);
@@ -128,7 +145,7 @@ function GachaHub({ startOpen = false }: Props) {
         <Animation
           rarity={pull.rarity}
           theme="crack"
-          imageSrc={pull.banner.image}
+          imageSrc={pull.image}
           onDone={closeAnimation}
         />
       )}
