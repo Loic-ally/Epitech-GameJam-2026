@@ -3,12 +3,12 @@
     "id": 1,
     "name": "Tiakola",
     "image": "",
-    "rarity": "",
+    "rarity": "commune",
     "type": "Suppport",
     "category": "LOL",
     "bio": "Il chante plus fort qu'il ne joue, sa Ahri est plus une icône qu'une menace",
     "attributes": ["fantome", "bdg", "zesti", "tranquilou", "mid"],
-    "stats": { "HP": 0, "ATK": 0, "DEF": 0, "Esquive": 0, "Critique": 0 }
+    "stats": { "HP": 910, "ATK": 72, "DEF": 88, "Esquive": 15, "Critique": 6 }
   },
   {
     "id": 2,
@@ -19,6 +19,6 @@
     "category": "RACISTE",
     "bio": "N'aiment pas manger de la viande halal...mais ensuite commande un kebab ?",
     "attributes": ["fantome", "bdg", "zesti", "tranquilou", "Parano", "Idéologie bien ancré"],
-    "stats": { "HP": 0, "ATK": 0, "DEF": 0, "Esquive": 0, "Critique": 0 }
+    "stats": { "HP": 1180, "ATK": 88, "DEF": 115, "Esquive": 19, "Critique": 6 }
   }
 ]

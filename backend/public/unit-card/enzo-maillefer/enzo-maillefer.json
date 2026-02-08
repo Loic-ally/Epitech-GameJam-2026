@@ -3,12 +3,12 @@
     "id": 1,
     "name": "W Nami",
     "image": "",
-    "rarity": "",
+    "rarity": "commune",
     "type": "Support",
     "category": "LOL",
     "bio": "Crois que tous les moves bon partent de lui en criant qu'il est le meilleur, mais bon si il est heureux comme ça (il faudra lui dire un jour)",
     "attributes": ["tek3", "bdg", "bavard", "pas de dodo", "support", "ligue poro", "bébé ouin ouin", "problème mental"],
-    "stats": { "HP": 0, "ATK": 0, "DEF": 0, "Esquive": 0, "Critique": 0 }
+    "stats": { "HP": 920, "ATK": 65, "DEF": 95, "Esquive": 14, "Critique": 5 }
   },
   {
     "id": 2,
@@ -19,7 +19,7 @@
     "category": "CSGO",
     "bio": "Demande toujours a ce qu'on lui acheter des armes car il n'a pas d'argent...à force d'acheter des awp",
     "attributes": ["tek3", "bdg", "bavard", "pas de dodo", "hell case", "SKIN = SKILL", "CRÉDIT REFUSÉ"],
-    "stats": { "HP": 0, "ATK": 0, "DEF": 0, "Esquive": 0, "Critique": 0 }
+    "stats": { "HP": 980, "ATK": 90, "DEF": 100, "Esquive": 15, "Critique": 8 }
   },
   {
     "id": 3,
@@ -30,6 +30,6 @@
     "category": "GAMBLING",
     "bio": "Maître du tapis vert, il distribue les cartes avec une froideur qui cache son envie de tout rafler.",
     "attributes": ["tek3", "bdg", "bavard", "pas de dodo", "Club Gambling"],
-    "stats": { "HP": 0, "ATK": 0, "DEF": 0, "Esquive": 0, "Critique": 0 }
+    "stats": { "HP": 1150, "ATK": 85, "DEF": 120, "Esquive": 18, "Critique": 8 }
   }
 ]

@@ -3,12 +3,12 @@
     "id": 1,
     "name": "J'étais caché",
     "image": "",
-    "rarity": "",
+    "rarity": "commune",
     "type": "Technique",
     "category": "LOL",
     "bio": "cherchez-le bien ou sa sale face de rat vous laissera pour mort",
     "attributes": ["tek2", "moche", "lunette", "calvasse", "fou", "jungle", "ligue poro", "bébé ouin ouin", "zoo de l'invocateur", "problème mental"],
-    "stats": { "HP": 0, "ATK": 0, "DEF": 0, "Esquive": 0, "Critique": 0 }
+    "stats": { "HP": 680, "ATK": 115, "DEF": 65, "Esquive": 22, "Critique": 17 }
   },
   {
     "id": 2,
@@ -19,6 +19,6 @@
     "category": "RACISTE",
     "bio": "Appelle le GIGN dès qu'il voit un touriste avec une carte. Pour lui, une pizza est une tentative de colonisation italienne",
     "attributes": ["tek2", "moche", "lunette", "calvasse", "fou", "Parano", "Idéologie bien ancré"],
-    "stats": { "HP": 0, "ATK": 0, "DEF": 0, "Esquive": 0, "Critique": 0 }
+    "stats": { "HP": 880, "ATK": 160, "DEF": 88, "Esquive": 28, "Critique": 22 }
   }
 ]
