@@ -29,8 +29,12 @@ const TRIGGER_SEQUENCE = [
 
 const normalizeKey = (key: string) => (key.length === 1 ? key.toLowerCase() : key);
 
-function GachaHub() {
-  const [gachaOpen, setGachaOpen] = useState(false);
+type Props = {
+  startOpen?: boolean;
+};
+
+function GachaHub({ startOpen = false }: Props) {
+  const [gachaOpen, setGachaOpen] = useState(startOpen);
   const [pull, setPull] = useState<{ banner: Banner; rarity: Rarity; count: 1 | 10 } | null>(null);
 
   const highlightedBanner = useMemo(() => GACHA_BANNERS[0], []);
