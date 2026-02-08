@@ -2,6 +2,7 @@ import React, { useMemo, useState } from 'react';
 import type { Rarity } from '../Animation';
 import type { ThemeName } from '../themeEffects';
 import './GachaPage.css';
+import { pullGacha } from '../api/gacha';
 
 export interface Banner {
   id: string;
@@ -23,7 +24,7 @@ export interface Banner {
 interface Props {
   banners: Banner[];
   onClose: () => void;
-  onPull: (banner: Banner, count: 1 | 10) => void;
+  onPull?: (banner: Banner, count: 1 | 10) => void;
 }
 
 const rarityLabel: Record<Rarity, string> = {
@@ -72,6 +73,31 @@ export default function GachaPage({ banners, onClose, onPull }: Props) {
   const [selectedId, setSelectedId] = useState<string>(banners[0]?.id ?? '');
   const [view, setView] = useState<'list' | 'detail'>('list');
   const selected = useMemo(() => banners.find((b) => b.id === selectedId) ?? banners[0], [banners, selectedId]);
+
+  const handlePull = async (banner: Banner, count: 1 | 10) => {
+    if (onPull) return onPull(banner, count);
+
+    const saved = localStorage.getItem('egj-auth-session');
+    if (!saved) {
+      alert('Connecte-toi pour tirer des cartes.');
+      return;
+    }
+    const session = JSON.parse(saved);
+    if (!session?.token) {
+      alert('Session invalide, reconnecte-toi.');
+      return;
+    }
+    try {
+      const data = await pullGacha(session.token, count);
+      const label = data.pulls
+        .map((c) => `#${c.id}${c.rarity ? ` (${c.rarity})` : ''}${c.name ? ` ${c.name}` : ''}`)
+        .join(', ') || 'rien';
+      alert(`Tu as tiré: ${label} (restant: ${data.remainingPool})`);
+    } catch (err: any) {
+      console.error(err);
+      alert(err?.message || 'Erreur pendant le pull');
+    }
+  };
 
   return (
     <div className={`gacha-overlay theme-${selected?.id ?? 'default'}`}>
@@ -181,8 +207,8 @@ export default function GachaPage({ banners, onClose, onPull }: Props) {
                 </div>
 
                 <div className="pull-row">
-                  <button className="play" onClick={() => onPull(selected, 1)}>Pull x1</button>
-                  <button className="play play--ghost" onClick={() => onPull(selected, 10)}>Pull x10</button>
+                  <button className="play" onClick={() => handlePull(selected, 1)}>Pull x1</button>
+                  <button className="play play--ghost" onClick={() => handlePull(selected, 10)}>Pull x10</button>
                   <span className="muted tiny">x10 garantit au moins Rare</span>
                 </div>
               </div>
