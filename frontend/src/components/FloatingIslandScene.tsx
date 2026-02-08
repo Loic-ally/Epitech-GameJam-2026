@@ -112,7 +112,7 @@ const KM0Building = () => {
           <BrickMaterial />
         </mesh>
         {/* Spire Roof */}
-        <mesh castShadow position={[0, 5, 0]} rotation={[0, Math.PI/4, 0]}>
+        <mesh castShadow position={[0, 5.5, 0]} rotation={[0, Math.PI/4, 0]}>
            <coneGeometry args={[1.2, 3, 4]} />
            <meshStandardMaterial color="#2d3436" />
         </mesh>
@@ -174,53 +174,79 @@ const StylizedCloud = ({ position, scale = 1 }: { position: [number, number, num
 const SceneController = ({ onFormVisible, onGameLaunch }: FloatingIslandSceneProps) => {
   const { camera } = useThree();
   const islandRef = useRef<THREE.Group>(null);
-
-  // Initial Auto-Rotation Ref (for manual control during transition)
-  const isTransitioning = useRef(false);
+  
+  // Track the state of our scene to handle rotation behaviors
+  const sceneState = useRef<'start' | 'transitioning' | 'form' | 'game'>('start');
 
   useFrame((state, delta) => {
-    // Continuous slow rotation in idle state
-    if (islandRef.current && !isTransitioning.current) {
-        islandRef.current.rotation.y += delta * 0.1; 
+    if (islandRef.current) {
+      if (sceneState.current === 'start') {
+        // Normal idle speed - IMPROVED: Faster idle (0.2)
+        islandRef.current.rotation.y += delta * 0.2; 
+      } else if (sceneState.current === 'form') {
+        // Slower rotation while in form view - IMPROVED: Faster form (0.1)
+        islandRef.current.rotation.y += delta * 0.5;
+      }
+      // 'transitioning' and 'game' have no manual rotation (handled by GSAP or stopped)
     }
   });
 
   useEffect(() => {
     (window as any).__transitionToForm = () => {
-      isTransitioning.current = true;
+      sceneState.current = 'transitioning';
 
-      // 1. CAMERA STAYS STATIC and SMOOTH (Just simple zoom)
-      // We start at [0, 6, 22]
+      // 1. CAMERA STAYS STATIC (Just simple zoom)
       gsap.to(camera.position, {
         x: 0, 
         y: 6,
-        z: 18, // Minimal Zoom In
+        z: 18, 
         duration: 1.5,
         ease: 'power2.inOut'
       });
       
-      // 2. ISLAND MOVES & ROTATES TO FACE CAMERA
+      // 2. ISLAND MOVES & ROTATES WITH "LAUNCH" SPIN
       if (islandRef.current) {
-        const targetRot = 0.5; // Roughly face front-right angle
+        const currentRot = islandRef.current.rotation.y;
+        
+        // Calculate forward rotation needed to reach 0.5
+        const twoPi = Math.PI * 2;
+        let normalizedRot = currentRot % twoPi;
+        if (normalizedRot < 0) normalizedRot += twoPi;
+
+        // How much more do we need to turn to reach 0.5?
+        let angleToTarget = 0.5 - normalizedRot;
+        if (angleToTarget <= 0) angleToTarget += twoPi; 
+
+        // Add exactly 1 extra full spin for the "launch" effect
+        const spinAmount = angleToTarget + twoPi;
+        const targetRot = currentRot + spinAmount;
 
         gsap.to(islandRef.current.rotation, {
           y: targetRot, 
           duration: 1.5,
-          ease: 'power2.out'
+          ease: 'power1.out', // Gentler ease that doesn't fully stop momentum before handling over
+          onComplete: () => {
+             if (islandRef.current) {
+                 islandRef.current.rotation.y = islandRef.current.rotation.y % twoPi;
+             }
+             sceneState.current = 'form'; 
+          }
         });
         
         // Move island to LEFT
         gsap.to(islandRef.current.position, {
-          x: -9, 
+          x: -6, 
           duration: 1.5,
           ease: 'power2.inOut'
         });
       }
-      setTimeout(() => onFormVisible?.(true), 1200);
+      setTimeout(() => onFormVisible?.(true), 1000); // Trigger form slight earlier for sync
     };
 
     (window as any).__transitionToGame = () => {
+      sceneState.current = 'transitioning';
       onFormVisible?.(false);
+      
       if (islandRef.current) {
         // Fly island up
         gsap.to(islandRef.current.position, {
@@ -236,7 +262,10 @@ const SceneController = ({ onFormVisible, onGameLaunch }: FloatingIslandScenePro
         y: -5,
         z: 5,
         duration: 1.5,
-        ease: 'power2.in'
+        ease: 'power2.in',
+        onComplete: () => {
+          sceneState.current = 'game';
+        }
       });
       setTimeout(() => onGameLaunch?.(), 1000);
     };
