@@ -2,6 +2,9 @@ import React, { FormEvent, useState } from 'react';
 import '../App.css';
 import { AuthForm } from '../components/AuthForm';
 import { AuthSession } from '../types/auth.type';
+import { FloatingIslandScene } from '../components/FloatingIslandScene';
+import { StartScreen } from '../components/StartScreen';
+import { useIslandScene } from '../hooks/useIslandScene';
 
 type Mode = 'login' | 'register';
 
@@ -19,6 +22,22 @@ const AuthPage: React.FC<AuthPageProps> = ({ onAuthenticated }) => {
   const [lastName, setLastName] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [showStart, setShowStart] = useState(true);
+  const [isBlurred, setIsBlurred] = useState(true);
+
+  const { isFormVisible, setFormVisible, launchGame } = useIslandScene();
+
+  const handleStart = () => {
+    setShowStart(false);
+    setIsBlurred(false);
+    
+    // Trigger island transition after start screen fades
+    setTimeout(() => {
+      if ((window as any).__transitionToForm) {
+        (window as any).__transitionToForm();
+      }
+    }, 500);
+  };
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -44,7 +63,12 @@ const AuthPage: React.FC<AuthPageProps> = ({ onAuthenticated }) => {
       }
 
       const data = (await res.json()) as AuthSession;
-      onAuthenticated(data);
+      
+      launchGame();
+      
+      setTimeout(() => {
+        onAuthenticated(data);
+      }, 2500);
     } catch (err: any) {
       setError(err?.message || 'Impossible de se connecter');
     } finally {
@@ -53,28 +77,56 @@ const AuthPage: React.FC<AuthPageProps> = ({ onAuthenticated }) => {
   };
 
   return (
-    <div className="app">
-      <div className="card">
-        <h1>{mode === 'login' ? 'Connexion' : 'Inscription'}</h1>
+    <>
+      <FloatingIslandScene 
+        onFormVisible={setFormVisible}
+        onGameLaunch={() => {}}
+        isBlurred={isBlurred}
+      />
 
-        <AuthForm
-          mode={mode}
-          email={email}
-          password={password}
-          firstName={firstName}
-          lastName={lastName}
-          isLoading={isLoading}
-          onModeChange={setMode}
-          onChangeEmail={setEmail}
-          onChangePassword={setPassword}
-          onChangeFirstName={setFirstName}
-          onChangeLastName={setLastName}
-          onSubmit={handleSubmit}
-        />
+      {showStart && (
+        <div 
+          className={`start-screen-wrapper ${!showStart ? 'hidden' : ''}`}
+          style={{
+            opacity: showStart ? 1 : 0,
+            transition: 'opacity 0.8s ease',
+          }}
+        >
+          <StartScreen onStart={handleStart} />
+        </div>
+      )}
 
-        {error && <p className="status" style={{ color: '#ffb5b5' }}>{error}</p>}
+      <div className="app" style={{ background: 'transparent' }}>
+        <div 
+          className="card" 
+          style={{
+            opacity: isFormVisible ? 1 : 0,
+            transform: isFormVisible ? 'translateY(0)' : 'translateY(20px)',
+            transition: 'opacity 0.8s ease, transform 0.8s ease',
+            pointerEvents: isFormVisible ? 'auto' : 'none',
+          }}
+        >
+          <h1>{mode === 'login' ? 'Connexion' : 'Inscription'}</h1>
+
+          <AuthForm
+            mode={mode}
+            email={email}
+            password={password}
+            firstName={firstName}
+            lastName={lastName}
+            isLoading={isLoading}
+            onModeChange={setMode}
+            onChangeEmail={setEmail}
+            onChangePassword={setPassword}
+            onChangeFirstName={setFirstName}
+            onChangeLastName={setLastName}
+            onSubmit={handleSubmit}
+          />
+
+          {error && <p className="status" style={{ color: '#ffb5b5' }}>{error}</p>}
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 

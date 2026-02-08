@@ -5,8 +5,20 @@
     "image": "",
     "rarity": "",
     "type": "Suppport",
+    "category": "LOL",
     "bio": "Il chante plus fort qu'il ne joue, sa Ahri est plus une icône qu'une menace",
     "attributes": ["fantome", "bdg", "zesti", "tranquilou", "mid"],
+    "stats": { "HP": 0, "ATK": 0, "DEF": 0, "Esquive": 0, "Critique": 0 }
+  },
+  {
+    "id": 2,
+    "name": "MAIS? C'EST HALAL?!!",
+    "image": "",
+    "rarity": "epique",
+    "type": "Suppport",
+    "category": "RACISTE",
+    "bio": "N'aiment pas manger de la viande halal...mais ensuite commande un kebab ?",
+    "attributes": ["fantome", "bdg", "zesti", "tranquilou", "Parano", "Idéologie bien ancré"],
     "stats": { "HP": 0, "ATK": 0, "DEF": 0, "Esquive": 0, "Critique": 0 }
   }
 ]

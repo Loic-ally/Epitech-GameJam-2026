@@ -5,8 +5,31 @@
     "image": "",
     "rarity": "",
     "type": "Technique",
+    "category": "LOL",
     "bio": "Il joue que yasuo et est malicieux avec, j'ai que ça à dire",
-    "attributes": ["tek3", "menteur", "aer", "gourmand", "mid", "0/10 Power Spike", "nul à lol"],
+    "attributes": ["tek2", "menteur", "aer", "gourmand", "mid", "0/10 Power Spike", "nul à lol"],
+    "stats": { "HP": 0, "ATK": 0, "DEF": 0, "Esquive": 0, "Critique": 0 }
+  },
+  {
+    "id": 2,
+    "name": "Je ne suis pas raciste, mais...",
+    "image": "",
+    "rarity": "commune",
+    "type": "Technique",
+    "category": "RACISTE",
+    "bio": "Convaincu qu'une conspiration mondiale veut lui faire manger du couscous en traître. Analyse l'ADN de son jambon.",
+    "attributes": ["tek2", "menteur", "aer", "gourmand", "Mauvaise Foi", "Idéologie bien ancré"],
+    "stats": { "HP": 0, "ATK": 0, "DEF": 0, "Esquive": 0, "Critique": 0 }
+  },
+  {
+    "id": 3,
+    "name": "LE CABRI",
+    "image": "",
+    "rarity": "rare",
+    "type": "Technique",
+    "category": "ESCALADE",
+    "bio": "Grimpe plus vite qu'il ne descend en division sur LoL.",
+    "attributes": ["tek2", "menteur", "aer", "gourmand", "Grimpeur"],
     "stats": { "HP": 0, "ATK": 0, "DEF": 0, "Esquive": 0, "Critique": 0 }
   }
 ]
