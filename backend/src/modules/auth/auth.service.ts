@@ -1,5 +1,5 @@
 import { AuthRepository } from './auth.repository.js';
-import bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { ENV_VARS } from '../../utils/environment.js';
 
@@ -21,9 +21,16 @@ export class AuthService {
 
         const insertedUser = await this.authRepository.createUser({ firstName, lastName, password: hashedPassword, email });
 
-        const accessToken = this.generateAccessToken({ _id: insertedUser.insertedId.toString() });
+        const token = this.generateAccessToken({ _id: insertedUser.insertedId.toString() });
 
-        return { accessToken };
+        const user = {
+            id: insertedUser.insertedId.toString(),
+            email,
+            firstName,
+            lastName,
+        };
+
+        return { token, user };
     }
 
     async login(email: string, password: string) {
@@ -39,8 +46,16 @@ export class AuthService {
             throw new Error('Invalid email or password');
         }
 
-        const accessToken = this.generateAccessToken({ _id: user._id.toString() });
+        const token = this.generateAccessToken({ _id: user._id.toString() });
 
-        return { accessToken };
+        return {
+            token,
+            user: {
+                id: user._id.toString(),
+                email: user.email,
+                firstName: user.firstName,
+                lastName: user.lastName,
+            },
+        };
     }
 }

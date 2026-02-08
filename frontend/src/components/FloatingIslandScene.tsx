@@ -3,7 +3,6 @@ import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { 
   OrbitControls, 
   Float, 
-  Sparkles, 
   Text
 } from '@react-three/drei';
 import { 
