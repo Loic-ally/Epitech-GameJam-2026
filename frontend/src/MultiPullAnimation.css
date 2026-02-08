@@ -1,0 +1,360 @@
+/* ════════════════════════════════════════
+   Multi-Pull x10 – Laptop Code + Cards
+   ════════════════════════════════════════ */
+
+.mp-screen {
+  position: fixed;
+  inset: 0;
+  background: #060a12;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  overflow: hidden;
+  animation: mpFadeIn 350ms ease-out;
+}
+
+@keyframes mpFadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+/* ══════════════════════════════════════
+   PHASE 1 – LAPTOP + CODE RAIN
+   ══════════════════════════════════════ */
+
+.mp-code-phase {
+  background: #0a0e17;
+}
+
+/* CRT scanlines */
+.mp-scanline {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.12) 0px,
+    rgba(0, 0, 0, 0.12) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+/* ── Laptop frame ── */
+
+.mp-laptop {
+  position: relative;
+  width: min(680px, 88vw);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  animation: mpLaptopIn 0.7s cubic-bezier(0.22, 1, 0.36, 1) both;
+  z-index: 2;
+}
+
+@keyframes mpLaptopIn {
+  from { opacity: 0; transform: perspective(800px) rotateX(15deg) translateY(60px) scale(0.92); }
+  to   { opacity: 1; transform: perspective(800px) rotateX(0deg) translateY(0) scale(1); }
+}
+
+/* Screen */
+.mp-laptop-screen {
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  background: #0c1021;
+  border: 3px solid #2a2e3d;
+  border-bottom: none;
+  border-radius: 12px 12px 0 0;
+  overflow: hidden;
+  position: relative;
+  box-shadow:
+    0 0 40px rgba(24, 211, 197, 0.08),
+    inset 0 0 80px rgba(24, 211, 197, 0.03);
+}
+
+/* Webcam dot */
+.mp-laptop-screen::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: #1a1e2e;
+  box-shadow: 0 0 3px rgba(24, 211, 197, 0.3);
+  z-index: 5;
+}
+
+/* Screen glow edge */
+.mp-laptop-screen::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 10px 10px 0 0;
+  pointer-events: none;
+  box-shadow: inset 0 0 1px rgba(255,255,255,0.08);
+}
+
+/* Base / keyboard */
+.mp-laptop-base {
+  width: 108%;
+  height: 18px;
+  background: linear-gradient(180deg, #2a2e3d 0%, #1e2130 100%);
+  border-radius: 0 0 8px 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.mp-laptop-trackpad {
+  width: 60px;
+  height: 5px;
+  border-radius: 3px;
+  background: rgba(255,255,255,0.06);
+}
+
+.mp-laptop-hinge {
+  width: 115%;
+  height: 5px;
+  background: linear-gradient(180deg, #1a1d2a, #12141e);
+  border-radius: 0 0 4px 4px;
+}
+
+/* ── Code inside the screen ── */
+
+.mp-code-rain {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  padding: 28px 20px 16px;
+  font-family: 'Fira Code', 'Courier New', monospace;
+  font-size: clamp(10px, 1.6vw, 14px);
+  line-height: 1.7;
+  scrollbar-width: none;
+}
+.mp-code-rain::-webkit-scrollbar { display: none; }
+
+.mp-code-line {
+  display: flex;
+  gap: 12px;
+  opacity: 0.7;
+  transition: opacity 350ms ease;
+}
+
+.mp-code-line--new {
+  opacity: 1;
+  animation: mpLineFlash 500ms ease-out;
+}
+
+.mp-line-num {
+  color: rgba(255,255,255,0.15);
+  user-select: none;
+  min-width: 20px;
+  text-align: right;
+}
+
+.mp-line-text {
+  color: #18d3c5;
+  white-space: pre;
+}
+
+/* Last 3 lines (status messages) in gold */
+.mp-code-line:nth-last-child(-n+4) .mp-line-text {
+  color: #ffc857;
+  font-weight: 700;
+}
+
+.mp-cursor {
+  color: #18d3c5;
+  animation: mpBlink 600ms steps(2, start) infinite;
+}
+
+@keyframes mpLineFlash {
+  0%   { background: rgba(24, 211, 197, 0.1); transform: translateX(-4px); }
+  100% { background: transparent; transform: translateX(0); }
+}
+
+@keyframes mpBlink {
+  to { visibility: hidden; }
+}
+
+/* ══════════════════════════════════════
+   PHASE 2 – CARDS GRID
+   ══════════════════════════════════════ */
+
+.mp-cards-phase {
+  animation: mpFlashTransition 0.5s ease-out;
+}
+
+@keyframes mpFlashTransition {
+  0%   { background: #fff; }
+  30%  { background: #18d3c5; }
+  100% { background: #060a12; }
+}
+
+.mp-bg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 40%, #0f1a2e 0%, #060a12 70%);
+  pointer-events: none;
+}
+
+/* ── Grid ── */
+
+.mp-grid {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 14px;
+  padding: 16px;
+  max-width: 1100px;
+  width: 92vw;
+  z-index: 2;
+}
+
+@media (max-width: 900px) {
+  .mp-grid {
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    max-width: 100vw;
+    padding: 8px;
+  }
+}
+
+@media (max-width: 560px) {
+  .mp-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+}
+
+/* ── Single card ── */
+
+.mp-card {
+  position: relative;
+  aspect-ratio: 3 / 4;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #111;
+  border: 2px solid rgba(255,255,255,0.08);
+  transform: scale(0.3) rotateY(60deg);
+  opacity: 0;
+  transition:
+    transform 0.55s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.45s ease,
+    box-shadow 0.6s ease,
+    border-color 0.6s ease;
+}
+
+.mp-card--in {
+  transform: scale(1) rotateY(0deg);
+  opacity: 1;
+  box-shadow: 0 0 28px var(--glow, rgba(150,150,150,0.2)),
+              0 12px 40px rgba(0,0,0,0.5);
+  border-color: rgba(255,255,255,0.15);
+}
+
+/* Rarity border accents */
+.mp-card--in.mp-rarity-rare    { border-color: rgba(59,130,246,0.5); }
+.mp-card--in.mp-rarity-epic    { border-color: rgba(168,85,247,0.5); }
+.mp-card--in.mp-rarity-legendary {
+  border-color: rgba(250,204,21,0.6);
+  animation: mpLegPulse 1.5s ease-in-out infinite alternate;
+}
+
+@keyframes mpLegPulse {
+  from { box-shadow: 0 0 28px rgba(250,204,21,0.4), 0 12px 40px rgba(0,0,0,0.5); }
+  to   { box-shadow: 0 0 55px rgba(250,204,21,0.65), 0 12px 40px rgba(0,0,0,0.5); }
+}
+
+/* Canvas fills the card */
+.mp-card-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Card image */
+.mp-card-img {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 1;
+  animation: mpImgIn 0.5s ease-out both;
+  mix-blend-mode: screen;
+  opacity: 0.85;
+}
+
+@keyframes mpImgIn {
+  from { opacity: 0; transform: scale(1.15); }
+  to   { opacity: 0.85; transform: scale(1); }
+}
+
+/* Rarity badge */
+.mp-badge {
+  position: absolute;
+  bottom: 6px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 3;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 2px 10px;
+  border-radius: 8px;
+  background: rgba(0,0,0,0.65);
+  color: #ccc;
+  backdrop-filter: blur(4px);
+  white-space: nowrap;
+}
+
+.mp-badge--rare      { color: #60a5fa; }
+.mp-badge--epic       { color: #c084fc; }
+.mp-badge--legendary  { color: #fbbf24; text-shadow: 0 0 8px rgba(250,204,21,0.6); }
+
+/* ── Back button ── */
+
+.mp-back {
+  margin-top: 24px;
+  z-index: 3;
+  animation: mpBtnIn 500ms ease both;
+}
+
+@keyframes mpBtnIn {
+  from { opacity: 0; transform: translateY(18px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── Tap hint ── */
+
+.mp-tap-hint {
+  position: absolute;
+  bottom: 28px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 5;
+  font-size: 13px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+  color: rgba(255,255,255,0.45);
+  text-transform: uppercase;
+  animation: mpHintPulse 1.8s ease-in-out infinite;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+@keyframes mpHintPulse {
+  0%, 100% { opacity: 0.35; }
+  50%      { opacity: 0.75; }
+}

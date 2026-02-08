@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import type { Rarity } from '../Animation';
+import type { ThemeName } from '../themeEffects';
 import './GachaPage.css';
 import { pullGacha } from '../api/gacha';
 
@@ -17,6 +18,7 @@ export interface Banner {
   dropRates: Record<Rarity, number>;
   featured: string[];
   until: string;
+  theme: ThemeName;
 }
 
 interface Props {
@@ -99,6 +101,27 @@ export default function GachaPage({ banners, onClose, onPull }: Props) {
 
   return (
     <div className={`gacha-overlay theme-${selected?.id ?? 'default'}`}>
+      <div className="fx-stack" aria-hidden>
+        <div className="fx-aurora" />
+        <div className="fx-rays" />
+        <div className="fx-noise" />
+        <div className="fx-glow" />
+        <div className="fx-spark-rain" />
+        <div className="fx-hex" />
+        <div className="fx-plasma" />
+        <div className="fx-filmgrain" />
+        <div className="fx-supernova" />
+        <div className="fx-vignette" />
+        <div className="fx-chroma" />
+        <div className="fx-scanlines-2" />
+        <div className="fx-bokeh" />
+        <div className="fx-speckles" />
+        <div className="fx-holo" />
+        <div className="fx-rings" />
+        <div className="fx-lightgrid" />
+        <div className="fx-lensflare" />
+        <div className="fx-tiltshift" />
+      </div>
       <div className={`gacha-panel theme-${selected?.id ?? 'default'}`}>
         <div className={`gacha-bg theme-${selected?.id ?? 'default'}`} aria-hidden />
         <header className="gacha-head">

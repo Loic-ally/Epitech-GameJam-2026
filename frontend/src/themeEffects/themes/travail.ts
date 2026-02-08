@@ -1,7 +1,8 @@
 /* Thème: travail – Étincelles industrielles/soudure tombantes */
-import { Fx } from '../shared';
-import { sparksFx } from '../effects/sparksFx';
+import { Fx, withImageOverlay } from '../shared';
+import { sparksTravailFx } from '../effects/sparksTravailFx';
+import travailImg from '../pics-for-themes/travail.png';
 
 export default function travail(): Fx {
-  return sparksFx(['#ff8c00', '#ffb347', '#ffd700', '#ff6600'], 300, 120);
+  return withImageOverlay(sparksTravailFx(), [travailImg], 'drop');
 }

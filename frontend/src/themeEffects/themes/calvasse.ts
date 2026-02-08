@@ -1,7 +1,8 @@
 /* Thème: calvasse – Éclat chromé brillant */
-import { Fx } from '../shared';
-import { sparkleFx } from '../effects/sparkleFx';
+import { Fx, withImageOverlay } from '../shared';
+import { sparkleCalvasseFx } from '../effects/sparkleCalvasseFx';
+import calvasseImg from '../pics-for-themes/calvasse.png';
 
 export default function calvasse(): Fx {
-  return sparkleFx(['#e0e0e0', '#ffffff', '#b0bec5', '#cfd8dc'], 1.2);
+  return withImageOverlay(sparkleCalvasseFx(), [calvasseImg], 'shimmer');
 }

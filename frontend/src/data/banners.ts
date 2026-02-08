@@ -1,5 +1,6 @@
 import type { Rarity } from '../Animation';
 import type { Banner } from '../components/GachaPage';
+import type { ThemeName } from '../themeEffects';
 
 export const GACHA_BANNERS: Banner[] = [
   {
@@ -17,6 +18,7 @@ export const GACHA_BANNERS: Banner[] = [
     dropRates: { common: 70, rare: 22, epic: 6, legendary: 2 },
     featured: ['Victor', 'Fragment du Big Bang', 'Noyau de Genèse', 'Couronne Stellaire'],
     until: '07/03/2026',
+    theme: 'crack' as ThemeName,
   },
   {
     id: 'adam',
@@ -33,5 +35,6 @@ export const GACHA_BANNERS: Banner[] = [
     dropRates: { common: 62, rare: 28, epic: 8, legendary: 2 },
     featured: ['Adam', 'Perle de Ki Originel', 'Brassards Lithiques', 'Fragment du Nexus'],
     until: '11/03/2026',
+    theme: 'travail' as ThemeName,
   },
 ];

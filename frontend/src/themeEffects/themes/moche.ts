@@ -1,7 +1,8 @@
 /* Thème: moche – Glitch cassé, distorsion, erreurs */
-import { Fx } from '../shared';
-import { glitchFx } from '../effects/glitchFx';
+import { Fx, withImageOverlay } from '../shared';
+import { glitchMocheFx } from '../effects/glitchMocheFx';
+import mocheImg from '../pics-for-themes/moche.png';
 
 export default function moche(): Fx {
-  return glitchFx(['#555', '#888', '#ff0000', '#333'], false);
+  return withImageOverlay(glitchMocheFx(), [mocheImg], 'glitch');
 }

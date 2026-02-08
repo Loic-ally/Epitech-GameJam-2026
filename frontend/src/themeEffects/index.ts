@@ -1,4 +1,5 @@
-import type { ThemeName, Fx } from './shared';
+import type { ThemeName, Fx, ImgStyle } from './shared';
+import { nullFx, withImageOverlay } from './shared';
 import aer from './themes/aer';
 import lunette from './themes/lunette';
 import travail from './themes/travail';
@@ -93,5 +94,100 @@ export function startThemeAnimation(
   };
 }
 
+/**
+ * Like startThemeAnimation but sizes the canvas to its parent element
+ * instead of the full window. Used for card-sized canvases (multi-pull grid).
+ */
+export function startThemeAnimationInElement(
+  canvas: HTMLCanvasElement,
+  theme: ThemeName,
+): () => void {
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return () => {};
+
+  const parent = canvas.parentElement;
+  const resize = () => {
+    const w = parent ? parent.clientWidth : canvas.clientWidth;
+    const h = parent ? parent.clientHeight : canvas.clientHeight;
+    canvas.width = w;
+    canvas.height = h;
+  };
+  resize();
+
+  const ro = new ResizeObserver(resize);
+  if (parent) ro.observe(parent);
+
+  const factory = THEME_MAP[theme] || THEME_MAP['crack'];
+  const fx = factory();
+  fx.init(canvas.width, canvas.height);
+
+  let raf = 0;
+  let last = performance.now();
+
+  const loop = () => {
+    const now = performance.now();
+    const dt = Math.min((now - last) / 1000, 0.05);
+    last = now;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    fx.frame(ctx, canvas.width, canvas.height, now / 1000, dt);
+    raf = requestAnimationFrame(loop);
+  };
+  raf = requestAnimationFrame(loop);
+
+  return () => {
+    cancelAnimationFrame(raf);
+    ro.disconnect();
+  };
+}
+
 /** All available theme names */
 export const ALL_THEMES: ThemeName[] = Object.keys(THEME_MAP) as ThemeName[];
+
+/* re-export image-only helpers for multi-pull */
+export { IMAGE_THEMES, pickImageTheme, imageOnlyFx } from './themeImageMap';
+export type { ImgTheme } from './themeImageMap';
+
+/**
+ * Start an image-only animation (PNG overlay, no particle base)
+ * sized to its parent element. Used for multi-pull mini-cards.
+ */
+export function startImageOnlyInElement(
+  canvas: HTMLCanvasElement,
+  imgTheme: { srcs: string[]; style: ImgStyle },
+): () => void {
+  const ctx = canvas.getContext('2d');
+  if (!ctx) return () => {};
+
+  const parent = canvas.parentElement;
+  const resize = () => {
+    const w = parent ? parent.clientWidth : canvas.clientWidth;
+    const h = parent ? parent.clientHeight : canvas.clientHeight;
+    canvas.width = w;
+    canvas.height = h;
+  };
+  resize();
+
+  const ro = new ResizeObserver(resize);
+  if (parent) ro.observe(parent);
+
+  const fx = withImageOverlay(nullFx(), imgTheme.srcs, imgTheme.style);
+  fx.init(canvas.width, canvas.height);
+
+  let raf = 0;
+  let last = performance.now();
+
+  const loop = () => {
+    const now = performance.now();
+    const dt = Math.min((now - last) / 1000, 0.05);
+    last = now;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    fx.frame(ctx, canvas.width, canvas.height, now / 1000, dt);
+    raf = requestAnimationFrame(loop);
+  };
+  raf = requestAnimationFrame(loop);
+
+  return () => {
+    cancelAnimationFrame(raf);
+    ro.disconnect();
+  };
+}
