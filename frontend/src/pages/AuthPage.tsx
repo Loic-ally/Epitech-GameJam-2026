@@ -62,12 +62,21 @@ const AuthPage: React.FC<AuthPageProps> = ({ onAuthenticated }) => {
         throw new Error(data?.error || 'Une erreur est survenue');
       }
 
-      const data = (await res.json()) as AuthSession;
+      const data = await res.json();
+      const session: AuthSession = {
+        token: data.token ?? data.accessToken,
+        user: data.user ?? {
+          id: data.user?.id ?? data._id ?? 'unknown',
+          email: email,
+          firstName: firstName || data.firstName,
+          lastName: lastName || data.lastName,
+        },
+      };
       
       launchGame();
       
       setTimeout(() => {
-        onAuthenticated(data);
+        onAuthenticated(session);
       }, 2500);
     } catch (err: any) {
       setError(err?.message || 'Impossible de se connecter');

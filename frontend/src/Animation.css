@@ -1,0 +1,192 @@
+/* ════════════════════════════════════════
+   Animation – Code rain + Reveal
+   ════════════════════════════════════════ */
+
+.anim-screen {
+  position: fixed;
+  inset: 0;
+  background: #0a0e17;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  overflow: hidden;
+}
+
+/* CRT scanline */
+.anim-scanline {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0.15) 0px,
+    rgba(0, 0, 0, 0.15) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+}
+
+/* ── Code rain ── */
+
+.anim-code-rain {
+  width: min(720px, 90vw);
+  height: 80vh;
+  overflow-y: auto;
+  padding: 32px 24px;
+  font-family: 'Fira Code', 'Courier New', monospace;
+  font-size: 14px;
+  line-height: 1.7;
+  scrollbar-width: none;
+}
+.anim-code-rain::-webkit-scrollbar {
+  display: none;
+}
+
+.anim-code-line {
+  display: flex;
+  gap: 16px;
+  opacity: 0.7;
+  transition: opacity 400ms ease;
+}
+
+.anim-code-line--new {
+  opacity: 1;
+  animation: animLineFlash 500ms ease-out;
+}
+
+.anim-line-num {
+  color: rgba(255, 255, 255, 0.18);
+  user-select: none;
+  min-width: 24px;
+  text-align: right;
+}
+
+.anim-line-text {
+  color: #18d3c5;
+  white-space: pre;
+}
+
+/* Last 3 lines (SYSTEM READY etc.) in gold */
+.anim-code-line:nth-last-child(-n+4) .anim-line-text {
+  color: #ffc857;
+  font-weight: 700;
+}
+
+.anim-cursor {
+  color: #18d3c5;
+  animation: animBlink 600ms steps(2, start) infinite;
+}
+
+@keyframes animLineFlash {
+  0% {
+    background: rgba(24, 211, 197, 0.12);
+    transform: translateX(-6px);
+  }
+  100% {
+    background: transparent;
+    transform: translateX(0);
+  }
+}
+
+@keyframes animBlink {
+  to { visibility: hidden; }
+}
+
+/* ── Reveal ── */
+
+.anim-reveal-bg {
+  background: radial-gradient(circle at 50% 50%, #0f1a2e, #060a12);
+}
+
+.anim-reveal-card {
+  position: relative;
+  border-radius: 22px;
+  overflow: hidden;
+  box-shadow: 0 0 0 rgba(24, 211, 197, 0), 0 40px 100px rgba(0, 0, 0, 0.7);
+  transform: scale(0.4) rotateY(40deg);
+  opacity: 0;
+  transition: transform 1s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.8s ease,
+    box-shadow 1.2s ease;
+  z-index: 2;
+}
+
+.anim-reveal-card--visible {
+  transform: scale(1) rotateY(0deg);
+  opacity: 1;
+  box-shadow: 0 0 60px rgba(24, 211, 197, 0.35), 0 40px 100px rgba(0, 0, 0, 0.5);
+}
+
+.anim-reveal-img {
+  display: block;
+  max-width: min(520px, 85vw);
+  max-height: 70vh;
+  object-fit: contain;
+  border-radius: 22px;
+}
+
+.anim-back {
+  margin-top: 32px;
+  z-index: 3;
+  animation: animFadeUp 600ms 1s ease both;
+}
+
+@keyframes animFadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ══════════════════════════════════
+   Lightning bolts FX (blue + yellow)
+   ══════════════════════════════════ */
+
+.lightning-canvas {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ══════════════════════════════════
+   Rarity-specific FX overrides
+   ══════════════════════════════════ */
+
+/* Common – subtle, no extra glow */
+.fx-common .anim-reveal-card--visible {
+  box-shadow: 0 0 30px rgba(150, 150, 150, 0.2), 0 30px 80px rgba(0, 0, 0, 0.5);
+}
+/* Rare – blue tint */
+.fx-rare .anim-reveal-card--visible {
+  box-shadow: 0 0 50px rgba(59, 130, 246, 0.4), 0 40px 100px rgba(0, 0, 0, 0.5);
+}
+
+/* Epic – purple glow */
+.fx-epic .anim-reveal-card--visible {
+  box-shadow: 0 0 70px rgba(168, 85, 247, 0.45), 0 40px 100px rgba(0, 0, 0, 0.5);
+}
+
+/* Legendary – massive golden glow + screen flash */
+.fx-legendary .anim-reveal-card--visible {
+  box-shadow: 0 0 100px rgba(250, 204, 21, 0.5),
+    0 0 200px rgba(59, 130, 246, 0.3),
+    0 40px 100px rgba(0, 0, 0, 0.5);
+}
+.fx-legendary::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: white;
+  opacity: 0;
+  pointer-events: none;
+  z-index: 50;
+  animation: screenFlash 600ms 0.2s ease-out forwards;
+}
+@keyframes screenFlash {
+  0%   { opacity: 0.7; }
+  100% { opacity: 0; }
+}

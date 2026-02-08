@@ -11,10 +11,14 @@ export class AuthController {
     async register(req: Request, res: Response) {
         try {
             const { firstName, lastName, email, password } = req.body;
-            const { accessToken } = await this.authService.register(firstName, lastName, password, email);
+            if (!email || !password || !firstName) {
+                return res.status(400).json({ msg: 'firstName, email et password sont requis' });
+            }
+            const session = await this.authService.register(firstName, lastName, password, email);
 
-            res.status(201).json({ accessToken });
+            res.status(201).json(session);
         } catch (error) {
+            console.error('Register error', error);
             res.status(500).json({ msg: 'Internal server error' });
         }
     }
@@ -22,10 +26,14 @@ export class AuthController {
     async login(req: Request, res: Response) {
         try {
             const { email, password } = req.body;
-            const { accessToken } = await this.authService.login(email, password);
+            if (!email || !password) {
+                return res.status(400).json({ msg: 'email et password sont requis' });
+            }
+            const session = await this.authService.login(email, password);
 
-            res.status(200).json({ accessToken });
+            res.status(200).json(session);
         } catch (error) {
+            console.error('Login error', error);
             res.status(500).json({ msg: 'Internal server error' });
         }
     }

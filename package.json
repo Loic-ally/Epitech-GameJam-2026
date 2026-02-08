@@ -1,0 +1,12 @@
+{
+  "name": "epitech-gamejam-2026",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "npm run start:frontend",
+    "start:frontend": "npm --prefix frontend start",
+    "start:backend": "npm --prefix backend start",
+    "install:all": "npm --prefix frontend install && npm --prefix backend install",
+    "dev": "npm --prefix backend start & npm --prefix frontend start"
+  }
+}
