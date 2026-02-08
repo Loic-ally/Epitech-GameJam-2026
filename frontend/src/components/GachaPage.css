@@ -2704,3 +2704,49 @@
   position: relative;
   overflow: hidden;
 }
+
+/* Simplified, accessible gacha presentation */
+.gacha-overlay.gacha-simple {
+  background: radial-gradient(circle at 50% 50%, rgba(24, 211, 197, 0.12), rgba(4, 11, 20, 0.96));
+  animation: gacha-overlay-in 0.35s ease-out;
+  filter: none;
+}
+
+.gacha-overlay.gacha-simple::before,
+.gacha-overlay.gacha-simple::after {
+  content: none;
+}
+
+.gacha-overlay.gacha-simple .gacha-bg {
+  background: radial-gradient(circle at 20% 20%, rgba(255, 200, 87, 0.08), transparent 40%),
+    radial-gradient(circle at 80% 60%, rgba(24, 211, 197, 0.1), transparent 40%),
+    linear-gradient(140deg, rgba(10, 16, 28, 0.9), rgba(5, 10, 18, 0.9));
+  opacity: 0.7;
+  filter: none;
+}
+
+.gacha-overlay.gacha-simple .gacha-bg::before,
+.gacha-overlay.gacha-simple .gacha-bg::after {
+  content: none;
+}
+
+.gacha-panel {
+  animation: gacha-panel-in 0.4s ease-out;
+}
+
+@keyframes gacha-overlay-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes gacha-panel-in {
+  from { opacity: 0; transform: translateY(12px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gacha-overlay.gacha-simple,
+  .gacha-panel {
+    animation: none;
+  }
+}

@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import type { Rarity } from '../Animation';
 import type { ThemeName } from '../themeEffects';
 import './GachaPage.css';
@@ -72,6 +72,9 @@ function BannerCard({
 export default function GachaPage({ banners, onClose, onPull }: Props) {
   const [selectedId, setSelectedId] = useState<string>(banners[0]?.id ?? '');
   const [view, setView] = useState<'list' | 'detail'>('list');
+  const [remainingPool, setRemainingPool] = useState<number | null>(null);
+  const [totalPool, setTotalPool] = useState<number | null>(null);
+  const [tickets, setTickets] = useState<number | null>(null);
   const selected = useMemo(() => banners.find((b) => b.id === selectedId) ?? banners[0], [banners, selectedId]);
 
   const handlePull = async (banner: Banner, count: 1 | 10) => {
@@ -87,8 +90,20 @@ export default function GachaPage({ banners, onClose, onPull }: Props) {
       alert('Session invalide, reconnecte-toi.');
       return;
     }
+    if (tickets !== null && tickets < count) {
+      alert('Pas assez de tickets.');
+      return;
+    }
     try {
       const data = await pullGacha(session.token, count);
+      if (typeof data.remainingPool === 'number') {
+        setRemainingPool(data.remainingPool);
+      }
+      if (typeof data.tickets === 'number') {
+        setTickets(data.tickets);
+      } else if (tickets !== null) {
+        setTickets(tickets - count);
+      }
       const label = data.pulls
         .map((c) => `#${c.id}${c.rarity ? ` (${c.rarity})` : ''}${c.name ? ` ${c.name}` : ''}`)
         .join(', ') || 'rien';
@@ -99,29 +114,30 @@ export default function GachaPage({ banners, onClose, onPull }: Props) {
     }
   };
 
+  useEffect(() => {
+    const saved = localStorage.getItem('egj-auth-session');
+    if (!saved) return;
+    try {
+      const session = JSON.parse(saved);
+      if (!session?.token) return;
+      fetch(`${(typeof window !== 'undefined' && (process.env.REACT_APP_API_URL ?? `${window.location.protocol}//${window.location.hostname}:3000/api`)) || ''}/gacha/status`, {
+        headers: { Authorization: `Bearer ${session.token}` },
+      })
+        .then((res) => (res.ok ? res.json() : null))
+        .then((data) => {
+          if (!data) return;
+          if (typeof data.remainingPool === 'number') setRemainingPool(data.remainingPool);
+          if (typeof data.totalPool === 'number') setTotalPool(data.totalPool);
+          if (typeof data.tickets === 'number') setTickets(data.tickets);
+        })
+        .catch(() => undefined);
+    } catch {
+      return;
+    }
+  }, []);
+
   return (
-    <div className={`gacha-overlay theme-${selected?.id ?? 'default'}`}>
-      <div className="fx-stack" aria-hidden>
-        <div className="fx-aurora" />
-        <div className="fx-rays" />
-        <div className="fx-noise" />
-        <div className="fx-glow" />
-        <div className="fx-spark-rain" />
-        <div className="fx-hex" />
-        <div className="fx-plasma" />
-        <div className="fx-filmgrain" />
-        <div className="fx-supernova" />
-        <div className="fx-vignette" />
-        <div className="fx-chroma" />
-        <div className="fx-scanlines-2" />
-        <div className="fx-bokeh" />
-        <div className="fx-speckles" />
-        <div className="fx-holo" />
-        <div className="fx-rings" />
-        <div className="fx-lightgrid" />
-        <div className="fx-lensflare" />
-        <div className="fx-tiltshift" />
-      </div>
+    <div className={`gacha-overlay gacha-simple theme-${selected?.id ?? 'default'}`}>
       <div className={`gacha-panel theme-${selected?.id ?? 'default'}`}>
         <div className={`gacha-bg theme-${selected?.id ?? 'default'}`} aria-hidden />
         <header className="gacha-head">
@@ -138,8 +154,17 @@ export default function GachaPage({ banners, onClose, onPull }: Props) {
                 <p className="muted">Page 2/2 · Détails + tirage x1 ou x10.</p>
               </>
             )}
+            {remainingPool !== null && (
+              <p className="muted small">
+                Remaining pulls: {remainingPool}{totalPool !== null ? ` / ${totalPool}` : ''}
+              </p>
+            )}
+            {tickets !== null && (
+              <p className="muted small">Tickets: {tickets}</p>
+            )}
           </div>
           <div className="head-actions">
+            <button className="ghost" onClick={() => { window.location.href = '/'; }}>Retour lobby</button>
             {view === 'detail' && (
               <button className="ghost" onClick={() => setView('list')}>Retour liste</button>
             )}

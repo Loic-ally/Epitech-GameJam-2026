@@ -17,5 +17,5 @@ export async function pullGacha(token: string, count: 1 | 10) {
     throw new Error(data?.msg || 'Pull impossible');
   }
 
-  return res.json() as Promise<{ pulls: { id: number; rarity?: string; name?: string }[]; remainingPool: number }>;
+  return res.json() as Promise<{ pulls: { id: number; rarity?: string; name?: string; cardType?: 'summoner' | 'unit' }[]; remainingPool: number; tickets?: number }>;
 }

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import '../App.css';
 import { LobbyPanel } from '../components/LobbyPanel';
 import { StatusPanel } from '../components/StatusPanel';
@@ -6,6 +6,7 @@ import { AuthUser } from '../types/auth.type';
 import { useRoom } from '../hooks/useRoom';
 import { Client, Room } from '@colyseus/sdk';
 import FPSGame from '../components/FPSGame';
+import BattleArenaGame from '../components/BattleArenaGame';
 
 export interface RoomsPageProps {
   user: AuthUser;
@@ -23,9 +24,12 @@ const RoomsPage: React.FC<RoomsPageProps> = ({ user, onLogout }) => {
   const [isJoining, setIsJoining] = useState(false);
   const [status, setStatus] = useState('Connecté');
   const [error, setError] = useState<string | null>(null);
+  const [battleRoomId, setBattleRoomId] = useState<string | null>(null);
 
   const client = useMemo(() => new Client(WS_ENDPOINT), []);
   const activeRoomRef = useRef<Room | null>(null);
+
+  const handleLeaveBattle = useCallback(() => setBattleRoomId(null), []);
 
   const userFirstName = user?.firstName || 'Utilisateur';
   const userDisplay = `${user?.firstName ?? ''} ${user?.lastName ?? ''}`.trim() || user?.email || 'Utilisateur';
@@ -47,6 +51,7 @@ const RoomsPage: React.FC<RoomsPageProps> = ({ user, onLogout }) => {
     try {
       const joinedRoom = await client.joinOrCreate('lobby', {
         displayName: userDisplay,
+        userId: user?.id,
       });
 
       activeRoomRef.current = joinedRoom;
@@ -66,8 +71,20 @@ const RoomsPage: React.FC<RoomsPageProps> = ({ user, onLogout }) => {
     }
   };
 
+  if (room && battleRoomId) {
+    return (
+      <BattleArenaGame
+        battleRoomId={battleRoomId}
+        onLeave={handleLeaveBattle}
+        wsEndpoint={WS_ENDPOINT}
+        displayName={userDisplay}
+        userId={user?.id}
+      />
+    );
+  }
+
   if (room)
-    return <FPSGame />
+    return <FPSGame onDuelStart={(id) => setBattleRoomId(id)} />
   return (
     <div className="app">
       <div className="card">

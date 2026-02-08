@@ -11,13 +11,117 @@ import { useRoom } from '../hooks/useRoom';
 import { Callbacks } from '@colyseus/sdk';
 import { Player } from '../types/player.type';
 import { ROOMS, RoomRegion } from '../config/rooms.config';
+import { DuelPrompt } from './DuelOverlays';
+import './FPSGame.css';
 
-const FPSGame: React.FC = () => {
+const API_BASE =
+    process.env.REACT_APP_API_URL ?? `${window.location.protocol}//${window.location.hostname}:3000/api`;
+
+interface FPSGameProps {
+    onDuelStart?: (battleRoomId: string) => void;
+}
+
+const FPSGame: React.FC<FPSGameProps> = ({ onDuelStart }) => {
     const containerRef = useRef<HTMLDivElement>(null);
     const sceneRef = useRef<THREE.Scene | null>(null);
     const playersRef = useRef<Map<string, Player>>(new Map());
     const { room } = useRoom();
     const [currentRoom, setCurrentRoom] = useState<RoomRegion | null>(null);
+
+    // Duel system state
+    const [nearbyPlayer, setNearbyPlayer] = useState<{ id: string; name: string } | null>(null);
+    const [menuOpen, setMenuOpen] = useState(false);
+    const [deckStatus, setDeckStatus] = useState<'unknown' | 'ready' | 'missing' | 'error'>('unknown');
+    const [deckMessage, setDeckMessage] = useState<string>('');
+    const [deckLoading, setDeckLoading] = useState(false);
+    const [duelWarning, setDuelWarning] = useState<string | null>(null);
+    const menuOpenRef = useRef(false);
+    const hasDeckRef = useRef(false);
+
+    const flattenIds = (value: unknown): number[] => {
+        if (Array.isArray(value)) {
+            return value.flat(Infinity).filter((v) => typeof v === 'number') as number[];
+        }
+        if (typeof value === 'number') return [value];
+        return [];
+    };
+
+    const getSession = () => {
+        try {
+            const raw = localStorage.getItem('egj-auth-session');
+            if (!raw) return null;
+            const parsed = JSON.parse(raw);
+            if (!parsed?.token) return null;
+            return parsed as { token: string; user?: { id?: string } };
+        } catch {
+            return null;
+        }
+    };
+
+    const fetchDeckStatus = useCallback(async () => {
+        const session = getSession();
+        if (!session?.token) {
+            setDeckStatus('missing');
+            setDeckMessage('Connecte-toi pour equiper un deck');
+            return;
+        }
+
+        setDeckLoading(true);
+        try {
+            const res = await fetch(`${API_BASE}/deck`, {
+                headers: { Authorization: `Bearer ${session.token}` },
+            });
+            if (!res.ok) {
+                if (res.status === 404) {
+                    setDeckStatus('missing');
+                    setDeckMessage('Aucun deck equipe');
+                } else {
+                    setDeckStatus('error');
+                    setDeckMessage('Erreur de chargement du deck');
+                }
+                return;
+            }
+            const deck = await res.json();
+            const units = flattenIds(deck?.unitCards);
+            const hasSummoner = typeof deck?.summonerCards === 'number';
+            if (hasSummoner && units.length > 0) {
+                setDeckStatus('ready');
+                setDeckMessage('Deck pret');
+            } else {
+                setDeckStatus('missing');
+                setDeckMessage('Deck incomplet');
+            }
+        } catch (err) {
+            setDeckStatus('error');
+            setDeckMessage('Erreur reseau');
+        } finally {
+            setDeckLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchDeckStatus();
+    }, [fetchDeckStatus]);
+
+    useEffect(() => {
+        if (menuOpen) {
+            fetchDeckStatus();
+        }
+    }, [menuOpen, fetchDeckStatus]);
+
+    useEffect(() => {
+        menuOpenRef.current = menuOpen;
+    }, [menuOpen]);
+
+    useEffect(() => {
+        hasDeckRef.current = deckStatus === 'ready';
+    }, [deckStatus]);
+
+    useEffect(() => {
+        if (!duelWarning) return;
+        const timer = setTimeout(() => setDuelWarning(null), 2500);
+        return () => clearTimeout(timer);
+    }, [duelWarning]);
 
     const createPlayerLabel = (name: string) => {
         const canvas = document.createElement('canvas');
@@ -172,6 +276,7 @@ const FPSGame: React.FC = () => {
         };
 
         const onMouseDown = () => {
+            if (menuOpenRef.current) return;
             document.body.requestPointerLock();
         };
 
@@ -188,8 +293,53 @@ const FPSGame: React.FC = () => {
             renderer.setSize(window.innerWidth, window.innerHeight);
         };
 
+        // Duel: E key handler
+        const onKeyDownDuel = (event: KeyboardEvent) => {
+            if (event.code === 'KeyE' && !event.repeat) {
+                if (!hasDeckRef.current) {
+                    setDuelWarning('Equipe un deck avant de lancer un duel (touche B).');
+                    return;
+                }
+                if (menuOpenRef.current) return;
+                // Find nearest player within 5 units
+                const myPos = playerCollider.end;
+                let closestId: string | null = null;
+                let closestDist = Infinity;
+
+                players.forEach((player, sessionId) => {
+                    if (sessionId === room?.sessionId) return;
+                    const dx = player.x - myPos.x;
+                    const dy = player.y - myPos.y;
+                    const dz = player.z - myPos.z;
+                    const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+                    if (dist < 5 && dist < closestDist) {
+                        closestId = sessionId;
+                        closestDist = dist;
+                    }
+                });
+
+                if (closestId && room) {
+                    room.send('duelChallenge', { targetId: closestId });
+                }
+            }
+        };
+
+        const onKeyDownMenu = (event: KeyboardEvent) => {
+            if (event.code === 'KeyB' && !event.repeat) {
+                setMenuOpen(prev => {
+                    const next = !prev;
+                    if (next && document.pointerLockElement) {
+                        document.exitPointerLock();
+                    }
+                    return next;
+                });
+            }
+        };
+
         document.addEventListener('keydown', onKeyDown);
+        document.addEventListener('keydown', onKeyDownDuel);
         document.addEventListener('keyup', onKeyUp);
+        document.addEventListener('keydown', onKeyDownMenu);
         container.addEventListener('mousedown', onMouseDown);
         document.body.addEventListener('mousemove', onMouseMove);
         window.addEventListener('resize', onWindowResize);
@@ -362,6 +512,22 @@ const FPSGame: React.FC = () => {
                 localCurrentRoomId = foundRoom?.id || null;
                 setCurrentRoom(foundRoom);
             }
+
+            // Check for nearby players (for duel prompt)
+            let nearestPlayer: { id: string; name: string } | null = null;
+            let nearestDist = Infinity;
+            players.forEach((player, sessionId) => {
+                if (sessionId === room?.sessionId) return;
+                const dx = player.x - pos.x;
+                const dy = player.y - pos.y;
+                const dz = player.z - pos.z;
+                const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+                if (dist < 5 && dist < nearestDist) {
+                    nearestDist = dist;
+                    nearestPlayer = { id: sessionId, name: player.displayName || 'Unknown' };
+                }
+            });
+            setNearbyPlayer(nearestPlayer);
         }
 
         function animate() {
@@ -394,6 +560,20 @@ const FPSGame: React.FC = () => {
         let playersCallback: any | null = null;
 
         if (room) {
+            // Duel message listeners
+            room.onMessage('duelStart', (message: any) => {
+                if (onDuelStart) {
+                    onDuelStart(message.battleRoomId);
+                }
+            });
+
+            room.onMessage('duelError', (message: any) => {
+                console.warn('Duel error:', message.message);
+                if (message?.message) {
+                    setDuelWarning(message.message);
+                }
+            });
+
             const callbacks = Callbacks.get(room as any) as any;
 
             callbacks.onAdd("players", async (entity: any, sessionId: string) => {
@@ -473,7 +653,9 @@ const FPSGame: React.FC = () => {
             }
 
             document.removeEventListener('keydown', onKeyDown);
+            document.removeEventListener('keydown', onKeyDownDuel);
             document.removeEventListener('keyup', onKeyUp);
+            document.removeEventListener('keydown', onKeyDownMenu);
             container.removeEventListener('mousedown', onMouseDown);
             document.body.removeEventListener('mousemove', onMouseMove);
             window.removeEventListener('resize', onWindowResize);
@@ -484,7 +666,7 @@ const FPSGame: React.FC = () => {
                 playersCallback();
             }
         };
-    }, [createPlayerModel, room]);
+    }, [createPlayerModel, room, onDuelStart]);
 
     return (
         <div ref={containerRef} id="container">
@@ -499,6 +681,37 @@ const FPSGame: React.FC = () => {
                     </div>
                 )}
             </div>
+
+            {/* Duel: Show prompt when near another player */}
+            <DuelPrompt nearbyPlayerName={nearbyPlayer?.name || null} />
+
+            <div className="lobby-hint">
+                <span>Press</span> <kbd>B</kbd> <span>for Gacha / Inventory / Deck</span>
+            </div>
+
+            {duelWarning && (
+                <div className="deck-warning">{duelWarning}</div>
+            )}
+
+            {menuOpen && (
+                <div className="lobby-menu">
+                    <div className="lobby-menu-card">
+                        <div className="lobby-menu-title">Lobby Menu</div>
+                        <div className={`deck-status ${deckStatus}`}>
+                            {deckLoading ? 'Chargement du deck...' : deckMessage || 'Deck'}
+                        </div>
+                        <div className="lobby-menu-actions">
+                            <button type="button" onClick={() => { window.location.href = '/pull'; }}>
+                                Gacha
+                            </button>
+                            <button type="button" onClick={() => { window.location.href = '/deck'; }}>
+                                Deck Builder
+                            </button>
+                        </div>
+                        <div className="lobby-menu-hint">Press B to close</div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
