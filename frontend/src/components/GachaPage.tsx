@@ -1,5 +1,6 @@
 import React, { useMemo, useState } from 'react';
 import type { Rarity } from '../Animation';
+import type { ThemeName } from '../themeEffects';
 import './GachaPage.css';
 
 export interface Banner {
@@ -16,6 +17,7 @@ export interface Banner {
   dropRates: Record<Rarity, number>;
   featured: string[];
   until: string;
+  theme: ThemeName;
 }
 
 interface Props {

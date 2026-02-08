@@ -1,7 +1,8 @@
 /* Thème: tchetchene – Flammes agressives, guerrier */
-import { Fx } from '../shared';
-import { fireFx } from '../effects/fireFx';
+import { Fx, withImageOverlay } from '../shared';
+import { fireTchetcheneFx } from '../effects/fireTchetcheneFx';
+import tchetImg from '../pics-for-themes/tchetchen.png';
 
 export default function tchetchene(): Fx {
-  return fireFx(['#ff3d00', '#ff6e40', '#ff9100', '#dd2c00'], 1.2, false);
+  return withImageOverlay(fireTchetcheneFx(), [tchetImg], 'shake');
 }

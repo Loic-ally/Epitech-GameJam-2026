@@ -1,7 +1,11 @@
 /* Thème: vieux – Film vintage, grain, poussière sépia */
-import { Fx } from '../shared';
+import { Fx, withImageOverlay } from '../shared';
 import { dustFx } from '../effects/dustFx';
+import vieuxImg from '../pics-for-themes/vieux.png';
 
 export default function vieux(): Fx {
-  return dustFx(['#d4c5a9', '#b8a88a', '#8d7b6a', '#c4b396']);
+  return withImageOverlay(
+    dustFx(['#fff', '#eee', '#ddd', '#ccc']),
+    [vieuxImg], 'sepia',
+  );
 }

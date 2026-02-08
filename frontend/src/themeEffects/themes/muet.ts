@@ -1,7 +1,8 @@
 /* Thème: muet – Traînées à peine visibles, quasi silence */
-import { Fx } from '../shared';
-import { streakFx } from '../effects/streakFx';
+import { Fx, withImageOverlay } from '../shared';
+import { streakMuetFx } from '../effects/streakMuetFx';
+import muetImg from '../pics-for-themes/muet.png';
 
 export default function muet(): Fx {
-  return streakFx(['#424242', '#616161', '#757575'], 60, 0.15, 15);
+  return withImageOverlay(streakMuetFx(), [muetImg], 'faint');
 }

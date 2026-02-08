@@ -1,8 +1,10 @@
 import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import './App.css';
 import Animation, { type Rarity } from './Animation';
+import MultiPullAnimation, { type PullResult } from './MultiPullAnimation';
 import GachaPage, { type Banner } from './components/GachaPage';
 import { GACHA_BANNERS } from './data/banners';
+import { ALL_THEMES, pickImageTheme, type ThemeName } from './themeEffects';
 
 function pickRarity(banner: Banner, count: 1 | 10): Rarity {
   const order: Rarity[] = ['common', 'rare', 'epic', 'legendary'];
@@ -24,7 +26,8 @@ function pickRarity(banner: Banner, count: 1 | 10): Rarity {
 
 function App() {
   const [gachaOpen, setGachaOpen] = useState(true);
-  const [pull, setPull] = useState<{ banner: Banner; rarity: Rarity; count: 1 | 10 } | null>(null);
+  const [pull, setPull] = useState<{ banner: Banner; rarity: Rarity; count: 1 | 10; theme: ThemeName } | null>(null);
+  const [multiPull, setMultiPull] = useState<PullResult[] | null>(null);
 
   const highlightedBanner = useMemo(() => GACHA_BANNERS[0], []);
 
@@ -67,11 +70,22 @@ function App() {
   }, []);
 
   const handlePull = useCallback((banner: Banner, count: 1 | 10) => {
-    const rarity = pickRarity(banner, count);
-    setPull({ banner, rarity, count });
+    if (count === 10) {
+      const pulls: PullResult[] = Array.from({ length: 10 }, () => ({
+        rarity: pickRarity(banner, count),
+        imgTheme: pickImageTheme(),
+        imageSrc: banner.image,
+      }));
+      setMultiPull(pulls);
+    } else {
+      const rarity = pickRarity(banner, count);
+      const theme = ALL_THEMES[Math.floor(Math.random() * ALL_THEMES.length)];
+      setPull({ banner, rarity, count, theme });
+    }
   }, []);
 
   const closeAnimation = useCallback(() => setPull(null), []);
+  const closeMultiPull = useCallback(() => setMultiPull(null), []);
 
   return (
     <div className="world-shell">
@@ -124,10 +138,14 @@ function App() {
       {pull && (
         <Animation
           rarity={pull.rarity}
-          theme="crack"
+          theme={pull.theme}
           imageSrc={pull.banner.image}
           onDone={closeAnimation}
         />
+      )}
+
+      {multiPull && (
+        <MultiPullAnimation pulls={multiPull} onDone={closeMultiPull} />
       )}
     </div>
   );

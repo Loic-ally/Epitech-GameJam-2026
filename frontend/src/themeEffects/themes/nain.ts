@@ -1,7 +1,8 @@
 /* Thème: nain – Petits confettis compacts bondissants */
-import { Fx } from '../shared';
-import { confettiFx } from '../effects/confettiFx';
+import { Fx, withImageOverlay } from '../shared';
+import { confettiNainFx } from '../effects/confettiNainFx';
+import nainImg from '../pics-for-themes/nain.png';
 
 export default function nain(): Fx {
-  return confettiFx(['#ff5252', '#448aff', '#69f0ae', '#ffd740', '#e040fb'], true);
+  return withImageOverlay(confettiNainFx(), [nainImg], 'bounce');
 }

@@ -1,7 +1,11 @@
 /* Thème: menteur – Lignes rouges qui grandissent depuis le centre */
-import { Fx } from '../shared';
+import { Fx, withImageOverlay } from '../shared';
 import { growFx } from '../effects/growFx';
+import menteurImg from '../pics-for-themes/menteur.png';
 
 export default function menteur(): Fx {
-  return growFx(['#d50000', '#ff1744', '#ff5252', '#b71c1c']);
+  return withImageOverlay(
+    growFx(['#fff', '#eee', '#ddd', '#ccc']),
+    [menteurImg], 'grow',
+  );
 }

@@ -1,7 +1,11 @@
 /* Thème: bavard – Ondes sonores multiples qui émanent */
-import { Fx } from '../shared';
+import { Fx, withImageOverlay } from '../shared';
 import { ringsFx } from '../effects/ringsFx';
+import bavardImg from '../pics-for-themes/bavard.png';
 
 export default function bavard(): Fx {
-  return ringsFx(['#00e676', '#69f0ae', '#00bcd4', '#80deea'], 2.5, 0.18, false);
+  return withImageOverlay(
+    ringsFx(['#fff', '#eee', '#ddd', '#ccc'], 2.5, 0.18, false),
+    [bavardImg], 'pulse',
+  );
 }
