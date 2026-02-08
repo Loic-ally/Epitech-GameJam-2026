@@ -1,5 +1,5 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
 import './App.css';
+<<<<<<< HEAD
 import Animation, { type Rarity } from './Animation';
 import MultiPullAnimation, { type PullResult } from './MultiPullAnimation';
 import GachaPage, { type Banner } from './components/GachaPage';
@@ -86,54 +86,30 @@ function App() {
 
   const closeAnimation = useCallback(() => setPull(null), []);
   const closeMultiPull = useCallback(() => setMultiPull(null), []);
+=======
+import AuthPage from './pages/AuthPage';
+import RoomsPage from './pages/RoomsPage';
+import GachaHub from './pages/GachaHub';
+import { RoomProvider } from './context/RoomContext';
+import { useAuthSession } from './hooks/useAuthSession';
+
+function App() {
+  const { session, authenticate, logout } = useAuthSession();
+  const isPullPreview = typeof window !== 'undefined' && window.location.pathname === '/pull';
+
+  if (isPullPreview) {
+    return <GachaHub startOpen />;
+  }
+>>>>>>> refs/remotes/origin/animation
 
   return (
-    <div className="world-shell">
-      <div className="map-card">
-        <div className="map-head">
-          <div>
-            <p className="eyebrow">Carte</p>
-            <h1>Hub principal</h1>
-            <p className="muted">
-              Déplace-toi sur la map. Le portail gacha est signalé en surbrillance : clique dessus ou sur le bouton
-              pour ouvrir la page des bannières.
-            </p>
-          </div>
-          <button className="play" onClick={() => setGachaOpen(true)}>Ouvrir le gacha</button>
-        </div>
-
-        <div className="map-grid">
-          <div className="map-node">
-            <span className="node-title">Hangar Nord</span>
-            <span className="node-meta">Boss hebdo</span>
-          </div>
-          <div className="map-node">
-            <span className="node-title">Quartier Est</span>
-            <span className="node-meta">Quêtes coop</span>
-          </div>
-          <button className="map-node map-node--gacha" onClick={() => setGachaOpen(true)}>
-            <span className="node-pulse" aria-hidden />
-            <span className="node-title">Portail Gacha</span>
-            <span className="node-meta">Place du Hub · {highlightedBanner.name}</span>
-          </button>
-          <div className="map-node">
-            <span className="node-title">Tour Sud</span>
-            <span className="node-meta">Défis solos</span>
-          </div>
-          <div className="map-node">
-            <span className="node-title">Bunker Ouest</span>
-            <span className="node-meta">Zone PvP</span>
-          </div>
-        </div>
-      </div>
-
-      {gachaOpen && (
-        <GachaPage
-          banners={GACHA_BANNERS}
-          onClose={() => setGachaOpen(false)}
-          onPull={handlePull}
-        />
+    <RoomProvider>
+      {session ? (
+        <RoomsPage user={session.user} onLogout={logout} />
+      ) : (
+        <AuthPage onAuthenticated={authenticate} />
       )}
+<<<<<<< HEAD
 
       {pull && (
         <Animation
@@ -148,6 +124,9 @@ function App() {
         <MultiPullAnimation pulls={multiPull} onDone={closeMultiPull} />
       )}
     </div>
+=======
+    </RoomProvider>
+>>>>>>> refs/remotes/origin/animation
   );
 }
 

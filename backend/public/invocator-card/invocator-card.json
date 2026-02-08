@@ -1,0 +1,409 @@
+[
+  {
+    "id": 1,
+    "name": "Adam VALLI",
+    "rarity": "commune",
+    "promo": "tek2",
+    "image": "adam.valli.jpg",
+    "leader_skill": {
+      "type": "stat_boost",
+      "target": "all",
+      "stats": [
+        {"stat": "Esquive", "value": 15, "unit": "percent"}
+      ]
+    }
+  },
+  {
+    "id": 2,
+    "name": "Alan CUNIN",
+    "rarity": "rare",
+    "promo": "tek3",
+    "image": "alan.cunin.jpg",
+    "leader_skill": {
+      "type": "stat_boost_conditional",
+      "target": "condition",
+      "condition": {
+        "attribute": "aer"
+      },
+      "stats": [
+        {"stat": "ATK", "value": 25, "unit": "percent"}
+      ]
+    }
+  },
+  {
+    "id": 3,
+    "name": "Anas BENNOUNI",
+    "rarity": "commune",
+    "promo": "tek2",
+    "image": "anas.bennouni.jpg",
+    "leader_skill": {
+      "type": "starting_cards",
+      "card_type": "buff_ATK",
+      "quantity": 1
+    }
+  },
+  {
+    "id": 4,
+    "name": "Askhab SALIKHOV",
+    "rarity": "legendaire",
+    "promo": "fantome",
+    "image": "askhab.salikhov.jpg",
+    "leader_skill": {
+      "type": "stat_boost_tradeoff_conditional",
+      "target": "condition",
+      "condition": {
+        "attribute": "tchétchène"
+      },
+      "boost": {"stat": "ATK", "value": 40, "unit": "percent"},
+      "penalty": {"stat": "DEF", "value": -15, "unit": "percent"}
+    }
+  },
+  {
+    "id": 5,
+    "name": "Aya KHADOUM",
+    "rarity": "legendaire",
+    "promo": "tek4",
+    "image": "aya.khadoum.jpg",
+    "leader_skill": {
+      "type": "stat_boost_conditional",
+      "target": "condition",
+      "condition": {
+        "attribute": "maghreb united"
+      },
+      "stats": [
+        {"stat": "HP", "value": 30, "unit": "percent"},
+        {"stat": "ATK", "value": 30, "unit": "percent"},
+        {"stat": "DEF", "value": 30, "unit": "percent"}
+      ]
+    }
+  },
+  {
+    "id": 6,
+    "name": "Aymeric BRETIN",
+    "rarity": "rare",
+    "promo": "tek3",
+    "image": "aymeric.bretin.jpg",
+    "leader_skill": {
+      "type": "stat_boost_conditional",
+      "target": "condition",
+      "condition": {
+        "attribute": "pas de dodo"
+      },
+      "stats": [
+        {"stat": "ATK", "value": 25, "unit": "percent"}
+      ]
+    }
+  },
+  {
+    "id": 7,
+    "name": "Corentin BERGAENTZEL",
+    "rarity": "epique",
+    "promo": "tek3",
+    "image": "corentin.bergaentzel.jpg",
+    "leader_skill": {
+      "type": "stat_boost_conditional",
+      "target": "condition",
+      "condition": {
+        "attribute": "bavard"
+      },
+      "stats": [
+        {"stat": "ATK", "value": 20, "unit": "percent"},
+        {"stat": "Critique", "value": 20, "unit": "percent"}
+      ]
+    }
+  },
+  {
+    "id": 8,
+    "name": "Enzo LAUGEL",
+    "rarity": "rare",
+    "promo": "tek2",
+    "image": "enzo.laugel.jpg",
+    "leader_skill": {
+      "type": "stat_boost_conditional",
+      "target": "condition",
+      "condition": {
+        "attribute": "nain"
+      },
+      "stats": [
+        {"stat": "Esquive", "value": 25, "unit": "percent"}
+      ]
+    }
+  },
+  {
+    "id": 9,
+    "name": "Enzo LORENZINI",
+    "rarity": "epique",
+    "promo": "tek3",
+    "image": "enzo.lorenzini.jpg",
+    "leader_skill": {
+      "type": "stat_boost_conditional",
+      "target": "condition",
+      "condition": {
+        "attribute": "aigris"
+      },
+      "stats": [
+        {"stat": "ATK", "value": 20, "unit": "percent"},
+        {"stat": "Critique", "value": 15, "unit": "percent"}
+      ]
+    }
+  },
+  {
+    "id": 10,
+    "name": "Enzo MAILLEFER",
+    "rarity": "commune",
+    "promo": "tek3",
+    "image": "enzo.maillefer.jpg",
+    "leader_skill": {
+      "type": "stat_boost",
+      "target": "all",
+      "stats": [
+        {"stat": "Critique", "value": 15, "unit": "percent"}
+      ]
+    }
+  },
+  {
+    "id": 11,
+    "name": "Ewan SHAFFAUSER",
+    "rarity": "commune",
+    "promo": "tek3",
+    "image": "ewan.shaffauser.jpg",
+    "leader_skill": {
+      "type": "stat_boost",
+      "target": "all",
+      "stats": [
+        {"stat": "Esquive", "value": 15, "unit": "percent"}
+      ]
+    }
+  },
+  {
+    "id": 12,
+    "name": "Florian PERIDY",
+    "rarity": "rare",
+    "promo": "tek3",
+    "image": "florian.peridy.jpg",
+    "leader_skill": {
+      "type": "stat_boost_conditional",
+      "target": "condition",
+      "condition": {
+        "attribute": "tranquilou"
+      },
+      "stats": [
+        {"stat": "DEF", "value": 25, "unit": "percent"}
+      ]
+    }
+  },
+  {
+    "id": 13,
+    "name": "Francis NGUYEN",
+    "rarity": "commune",
+    "promo": "tek2",
+    "image": "francis.nguyen.jpg",
+    "leader_skill": {
+      "type": "stat_boost_conditional",
+      "target": "condition",
+      "condition": {
+        "attribute": "chinois de la caillé"
+      },
+      "stats": [
+        {"stat": "ATK", "value": 15, "unit": "percent"}
+      ]
+    }
+  },
+  {
+    "id": 14,
+    "name": "Gabriel LEVEQUE",
+    "rarity": "rare",
+    "promo": "tek3",
+    "image": "gabriel.leveque.jpg",
+    "leader_skill": {
+      "type": "starting_cards",
+      "card_type": "soin",
+      "quantity": 2
+    }
+  },
+  {
+    "id": 15,
+    "name": "Gibril BELAHIT",
+    "rarity": "rare",
+    "promo": "tek2",
+    "image": "gibril.belahit.jpg",
+    "leader_skill": {
+      "type": "regeneration_conditional",
+      "target": "condition",
+      "condition": {
+        "attribute": "tranquilou"
+      },
+      "effect": "regen_hp",
+      "value": 3,
+      "unit": "percent_per_turn"
+    }
+  },
+  {
+    "id": 16,
+    "name": "Hedi BANNOUR",
+    "rarity": "epique",
+    "promo": "tek3",
+    "image": "hedi.bannour.jpg",
+    "leader_skill": {
+      "type": "stat_boost_conditional_multiple",
+      "target": "condition",
+      "conditions": [
+        {"attribute": "maghreb united"},
+        {"attribute": "vieux"}
+      ],
+      "stats": [
+        {"stat": "HP", "value": 30, "unit": "percent"}
+      ]
+    }
+  },
+  {
+    "id": 17,
+    "name": "Keziah OBRIST",
+    "rarity": "epique",
+    "promo": "fantome",
+    "image": "keziah.obrist.jpg",
+    "leader_skill": {
+      "type": "stat_boost_conditional",
+      "target": "condition",
+      "condition": {
+        "promo": "fantome"
+      },
+      "stats": [
+        {"stat": "DEF", "value": 30, "unit": "percent"}
+      ]
+    }
+  },
+  {
+    "id": 18,
+    "name": "Lilian RICHARD",
+    "rarity": "commune",
+    "promo": "tek1",
+    "image": "lilian.richard.jpg",
+    "leader_skill": {
+      "type": "stat_boost",
+      "target": "all",
+      "stats": [
+        {"stat": "DEF", "value": 10, "unit": "percent"}
+      ]
+    }
+  },
+  {
+    "id": 19,
+    "name": "Loic PHILIPPE",
+    "rarity": "rare",
+    "promo": "tek2",
+    "image": "loic.philippe.jpg",
+    "leader_skill": {
+      "type": "stat_boost_tradeoff",
+      "target": "all",
+      "boost": {"stat": "Critique", "value": 25, "unit": "percent"},
+      "penalty": {"stat": "DEF", "value": -5, "unit": "percent"}
+    }
+  },
+  {
+    "id": 20,
+    "name": "Lucas ANDRES",
+    "rarity": "rare",
+    "promo": "tek3",
+    "image": "lucas.andres.jpg",
+    "leader_skill": {
+      "type": "stat_boost_conditional",
+      "target": "condition",
+      "condition": {
+        "attribute": "muet"
+      },
+      "stats": [
+        {"stat": "Esquive", "value": 25, "unit": "percent"}
+      ]
+    }
+  },
+  {
+    "id": 21,
+    "name": "Matt BLONDEAU",
+    "rarity": "commune",
+    "promo": "tek1",
+    "image": "matt.blondeau.jpg",
+    "leader_skill": {
+      "type": "stat_boost",
+      "target": "all",
+      "stats": [
+        {"stat": "Esquive", "value": 12, "unit": "percent"}
+      ]
+    }
+  },
+  {
+    "id": 22,
+    "name": "Nathan CALLIGARI",
+    "rarity": "commune",
+    "promo": "tek3",
+    "image": "nathan.calligari.jpg",
+    "leader_skill": {
+      "type": "stat_boost_conditional_multiple",
+      "target": "condition",
+      "conditions": [
+        {"attribute": "tchétchène"},
+        {"attribute": "tranquilou"}
+      ],
+      "stats": [
+        {"stat": "DEF", "value": 20, "unit": "percent"}
+      ]
+    }
+  },
+  {
+    "id": 23,
+    "name": "Quentin BRAUN",
+    "rarity": "legendaire",
+    "promo": "tek4",
+    "image": "quentin.braun.jpg",
+    "leader_skill": {
+      "type": "stat_boost",
+      "target": "all",
+      "stats": [
+        {"stat": "DEF", "value": 35, "unit": "percent"},
+        {"stat": "HP", "value": 35, "unit": "percent"}
+      ]
+    }
+  },
+  {
+    "id": 24,
+    "name": "Quentin RITZLER",
+    "rarity": "commune",
+    "promo": "tek2",
+    "image": "quentin.ritzler.jpg",
+    "leader_skill": {
+      "type": "stat_boost",
+      "target": "all",
+      "stats": [
+        {"stat": "Esquive", "value": 10, "unit": "percent"},
+        {"stat": "Critique", "value": 10, "unit": "percent"}
+      ]
+    }
+  },
+  {
+    "id": 25,
+    "name": "Romain HANSER",
+    "rarity": "commune",
+    "promo": "fantome",
+    "image": "romain.hanser.jpg",
+    "leader_skill": {
+      "type": "special_evasion",
+      "target": "all",
+      "effect": "Esquive",
+      "value": 15,
+      "unit": "percent"
+    }
+  },
+  {
+    "id": 26,
+    "name": "Victor JACQUINOT-FEGA",
+    "rarity": "epique",
+    "promo": "tek3",
+    "image": "victor.jacquinot-fega.png",
+    "leader_skill": {
+      "type": "stat_boost_tradeoff",
+      "target": "all",
+      "boost": {"stat": "ATK", "value": 35, "unit": "percent"},
+      "penalty": {"stat": "DEF", "value": -10, "unit": "percent"}
+    }
+  }
+]

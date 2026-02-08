@@ -1,0 +1,24 @@
+[
+  {
+    "id": 1,
+    "name": "Victor d'arcane",
+    "image": "",
+    "rarity": "",
+    "type": "Suppport",
+    "category": "LOL",
+    "bio": "ge suy lhe Vyktore d'artkanne",
+    "attributes": ["tek2", "nain", "lunette", "bavard", "mid", "nul à lol"],
+    "stats": { "HP": 0, "ATK": 0, "DEF": 0, "Esquive": 0, "Critique": 0 }
+  },
+  {
+    "id": 2,
+    "name": "POIDS PLUME",
+    "image": "",
+    "rarity": "rare",
+    "type": "Suppport",
+    "category": "ESCALADE",
+    "bio": "Sa légèreté est son arme secrète pour atteindre les sommets.",
+    "attributes": ["tek2", "nain", "lunette", "bavard", "Grimpeur"],
+    "stats": { "HP": 0, "ATK": 0, "DEF": 0, "Esquive": 0, "Critique": 0 }
+  }
+]

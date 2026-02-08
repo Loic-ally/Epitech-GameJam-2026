@@ -1,0 +1,24 @@
+[
+  {
+    "id": 1,
+    "name": "Tous les persos lol",
+    "image": "",
+    "rarity": "",
+    "type": "Attaque",
+    "category": "LOL",
+    "bio": "Il joue quelle poste serieux",
+    "attributes": ["tek3", "gourmand", "lunette", "zesti", "adc"],
+    "stats": { "HP": 0, "ATK": 0, "DEF": 0, "Esquive": 0, "Critique": 0 }
+  },
+  {
+    "id": 2,
+    "name": "L'ÉQUILIBRISTE",
+    "image": "",
+    "rarity": "commune",
+    "type": "Attaque",
+    "category": "ESCALADE",
+    "bio": "Capable de tenir sur un seul orteil si le sommet est proche.",
+    "attributes": ["tek3", "gourmand", "lunette", "zesti", "Grimpeur"],
+    "stats": { "HP": 0, "ATK": 0, "DEF": 0, "Esquive": 0, "Critique": 0 }
+  }
+]
