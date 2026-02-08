@@ -8,6 +8,7 @@ import GachaPage from './components/GachaPage';
 import { GACHA_BANNERS } from './data/banners';
 import InventoryPage from './pages/InventoryPage';
 import DeckBuilderPage from './pages/DeckBuilderPage';
+import PullPreviewPage from './pages/PullPreviewPage';
 
 function App() {
   const { session, authenticate, logout } = useAuthSession();
@@ -17,11 +18,7 @@ function App() {
   const isDeckBuilder = path === '/deck';
 
   if (isPullPreview) {
-    return (
-      <div className="world-shell">
-        <GachaPage banners={GACHA_BANNERS} onClose={() => window.history.back()} />
-      </div>
-    );
+    return <PullPreviewPage banners={GACHA_BANNERS} onClose={() => window.history.back()} />;
   }
 
   if (isInventory) {
