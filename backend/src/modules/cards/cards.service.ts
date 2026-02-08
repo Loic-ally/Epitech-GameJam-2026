@@ -22,10 +22,8 @@ export class CardsService {
 
   async getUnitCardById(parentId: number, cardId: number): Promise<UnitCard | null> {
     try {
-      console.log(this.unitCardsIndexPath)
       const indexData = await fs.readFile(this.unitCardsIndexPath, 'utf-8');
       const index = JSON.parse(indexData) as UnitCardIndex[];
-      console.log(index)
       const cardInfo = index.find(card => card.id === parentId);
 
       if (!cardInfo){

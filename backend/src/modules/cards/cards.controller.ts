@@ -40,14 +40,14 @@ export class CardsController {
         return res.status(400).json({ msg: 'Invalid card ID or parent ID' });
       }
 
-      const card = await this.cardsService.getUnitCardById(parentId, cardId);
+      let card = await this.cardsService.getUnitCardById(parentId, cardId);
 
       if (!card) {
         return res.status(404).json({ msg: 'Unit card not found' });
       }
 
       card.image = `${req.protocol}://${req.get('host')}/unit-card/${card.image}`;
-      res.status(200).json(card);
+      res.status(200).json({ ...card, parentId });
     } catch (error) {
       res.status(500).json({ message: 'Internal server error' });
     }
