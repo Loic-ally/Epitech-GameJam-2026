@@ -3,11 +3,11 @@
     "id": 1,
     "name": "Viego kevin",
     "image": "",
-    "rarity": "",
+    "rarity": "commune",
     "type": "Attaquant",
     "category": "LOL",
     "bio": "un jeune joueur prometteur et plein de fierté (surtout de fierté)...dommage qu'il ait fait une game désastreuse avec son viego depuis on a plus jamais entendu parler de lui",
     "attributes": ["tek4", "moche", "lunette", "aer", "jungle", "rage quit", "nul à lol"],
-    "stats": { "HP": 0, "ATK": 0, "DEF": 0, "Esquive": 0, "Critique": 0 }
+    "stats": { "HP": 780, "ATK": 145, "DEF": 55, "Esquive": 11, "Critique": 19 }
   }
 ]

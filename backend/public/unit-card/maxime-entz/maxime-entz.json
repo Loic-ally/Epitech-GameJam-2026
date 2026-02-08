@@ -3,12 +3,12 @@
     "id": 1,
     "name": "Power spike",
     "image": "",
-    "rarity": "",
+    "rarity": "commune",
     "type": "Technique",
     "category": "LOL",
     "bio": "Il joue que yasuo et est malicieux avec, j'ai que ça à dire",
     "attributes": ["tek2", "menteur", "aer", "gourmand", "mid", "0/10 Power Spike", "nul à lol"],
-    "stats": { "HP": 0, "ATK": 0, "DEF": 0, "Esquive": 0, "Critique": 0 }
+    "stats": { "HP": 710, "ATK": 118, "DEF": 68, "Esquive": 19, "Critique": 16 }
   },
   {
     "id": 2,
@@ -19,7 +19,7 @@
     "category": "RACISTE",
     "bio": "Convaincu qu'une conspiration mondiale veut lui faire manger du couscous en traître. Analyse l'ADN de son jambon.",
     "attributes": ["tek2", "menteur", "aer", "gourmand", "Mauvaise Foi", "Idéologie bien ancré"],
-    "stats": { "HP": 0, "ATK": 0, "DEF": 0, "Esquive": 0, "Critique": 0 }
+    "stats": { "HP": 720, "ATK": 122, "DEF": 72, "Esquive": 20, "Critique": 15 }
   },
   {
     "id": 3,
@@ -30,6 +30,6 @@
     "category": "ESCALADE",
     "bio": "Grimpe plus vite qu'il ne descend en division sur LoL.",
     "attributes": ["tek2", "menteur", "aer", "gourmand", "Grimpeur"],
-    "stats": { "HP": 0, "ATK": 0, "DEF": 0, "Esquive": 0, "Critique": 0 }
+    "stats": { "HP": 800, "ATK": 140, "DEF": 82, "Esquive": 24, "Critique": 18 }
   }
 ]

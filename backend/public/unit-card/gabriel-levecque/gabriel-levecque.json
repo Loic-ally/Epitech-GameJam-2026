@@ -3,12 +3,12 @@
     "id": 1,
     "name": "C'etait la game de chauffe les gars",
     "image": "",
-    "rarity": "",
+    "rarity": "commune",
     "type": "Attaquant",
     "category": "LOL",
     "bio": "même apres la 20e lose d'affilée ce sera toujours sa game de chauffe",
     "attributes": ["tek3", "aer", "lunette", "travail", "jungle", "ligue poro"],
-    "stats": { "HP": 0, "ATK": 0, "DEF": 0, "Esquive": 0, "Critique": 0 }
+    "stats": { "HP": 740, "ATK": 145, "DEF": 65, "Esquive": 12, "Critique": 18 }
   },
   {
     "id": 2,
@@ -19,7 +19,7 @@
     "category": "ESCALADE",
     "bio": "Il voit des prises là où les autres ne voient que du vide.",
     "attributes": ["tek3", "aer", "lunette", "travail", "Grimpeur"],
-    "stats": { "HP": 0, "ATK": 0, "DEF": 0, "Esquive": 0, "Critique": 0 }
+    "stats": { "HP": 920, "ATK": 185, "DEF": 75, "Esquive": 16, "Critique": 24 }
   },
   {
     "id": 3,
@@ -30,6 +30,6 @@
     "category": "PIRATE",
     "bio": "Un pirate spécialiser dans l'infiltration de bateau adverse",
     "attributes": ["tek3", "aer", "lunette", "travail", "as de l'abordage", "Ingénieurs du Chaos", "Loup Solitaire (Bonus si seul)", "le Bateau conquerant"],
-    "stats": { "HP": 0, "ATK": 0, "DEF": 0, "Esquive": 0, "Critique": 0 }
+    "stats": { "HP": 900, "ATK": 180, "DEF": 70, "Esquive": 18, "Critique": 28 }
   }
 ]

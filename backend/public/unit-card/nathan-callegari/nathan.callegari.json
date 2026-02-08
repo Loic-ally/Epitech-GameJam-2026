@@ -3,11 +3,11 @@
     "id": 1,
     "name": "Je veux pas jouer mid",
     "image": "",
-    "rarity": "",
+    "rarity": "commune",
     "type": "Attaquant",
     "category": "LOL",
     "bio": "Il joue adc si jamais mais tous le monde le mes mid",
     "attributes": ["tek3", "tchétchene", "tranquilou", "travail", "adc", "ligue poro"],
-    "stats": { "HP": 0, "ATK": 0, "DEF": 0, "Esquive": 0, "Critique": 0 }
+    "stats": { "HP": 770, "ATK": 148, "DEF": 58, "Esquive": 9, "Critique": 21 }
   }
 ]
