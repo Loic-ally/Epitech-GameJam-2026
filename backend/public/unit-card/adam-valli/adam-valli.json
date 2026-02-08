@@ -5,8 +5,42 @@
     "image": "",
     "rarity": "",
     "type": "Technique",
+    "category": "LOL",
     "bio": "Un singe malin qui joue un singe...on aura tout vu",
     "attributes": ["tek2", "maghreb united", "bdg", "bavard", "jungle", "nul à lol", "zoo de l'invocateur"],
+    "stats": { "HP": 0, "ATK": 0, "DEF": 0, "Esquive": 0, "Critique": 0 }
+  },
+  {
+    "id": 2,
+    "name": "SINJE TIREUR",
+    "image": "",
+    "rarity": "rare",
+    "type": "Technique",
+    "category": "CSGO",
+    "bio": "Un singe qui manie une arme ? Attention aux degats",
+    "attributes": ["tek2", "maghreb united", "bdg", "bavard", "hell case", "SKIN = SKILL"],
+    "stats": { "HP": 0, "ATK": 0, "DEF": 0, "Esquive": 0, "Critique": 0 }
+  },
+  {
+    "id": 3,
+    "name": "L'ADDICT DU ALL-IN",
+    "image": "",
+    "rarity": "legendaire",
+    "type": "Technique",
+    "category": "GAMBLING",
+    "bio": "Pour lui, la prudence est une insulte ; il pousse tout au milieu à la moindre étincelle de jeu.",
+    "attributes": ["tek2", "maghreb united", "bdg", "bavard", "Club Gambling"],
+    "stats": { "HP": 0, "ATK": 0, "DEF": 0, "Esquive": 0, "Critique": 0 }
+  },
+  {
+    "id": 4,
+    "name": "Pastel",
+    "image": "",
+    "rarity": "epique",
+    "type": "Technique",
+    "category": "WANKUL",
+    "bio": "Sur son CV, il a fait trafiquant de drogue, militaire, mafieux, policier et vendeur de glaces",
+    "attributes": ["tek2", "maghreb united", "bdg", "bavard", "Duo de Mythos", "Crimes de Guerre"],
     "stats": { "HP": 0, "ATK": 0, "DEF": 0, "Esquive": 0, "Critique": 0 }
   }
 ]

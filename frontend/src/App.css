@@ -2,22 +2,59 @@
   min-height: 100vh;
   display: flex;
   align-items: center;
-  justify-content: center;
-  background: radial-gradient(circle at 20% 20%, #13203d, #0a0f1f 40%, #060915 70%);
+  justify-content: flex-end;
+  padding: 24px 80px 24px 24px;
+  width: 100%;
+  background: transparent;
   color: #e6ebff;
   font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-  padding: 24px;
   box-sizing: border-box;
+  position: relative;
+  z-index: 1;
 }
 
 .card {
   width: min(420px, 100%);
-  background: rgba(255, 255, 255, 0.04);
-  border: 1px solid rgba(255, 255, 255, 0.07);
-  border-radius: 18px;
-  padding: 28px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35), 0 0 0 1px rgba(255, 255, 255, 0.02);
-  backdrop-filter: blur(10px);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 24px;
+  padding: 36px;
+  box-shadow: 
+    0 8px 32px 0 rgba(31, 38, 135, 0.37),
+    inset 0 0 60px rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+  position: relative;
+  z-index: 10;
+}
+
+.start-screen-wrapper {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  backdrop-filter: blur(6px);
+  background: radial-gradient(circle at 50% 50%, rgba(8, 12, 30, 0.25), rgba(8, 12, 30, 0.6));
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  border-radius: 24px;
+  padding: 1px;
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.3), 
+    rgba(255, 255, 255, 0.05)
+  );
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  pointer-events: none;
 }
 
 .mode-switch {
@@ -28,25 +65,33 @@
 }
 
 .mode-switch button {
-  padding: 10px 12px;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  background: rgba(255, 255, 255, 0.06);
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.08);
   color: #e6ebff;
   cursor: pointer;
-  transition: all 120ms ease;
+  transition: all 200ms ease;
+  font-weight: 600;
 }
 
 .mode-switch button.active {
   background: linear-gradient(135deg, #4f7cff, #36d0ff);
-  color: #071026;
-  box-shadow: 0 10px 25px rgba(54, 208, 255, 0.25);
+  color: #ffffff;
+  border-color: transparent;
+  box-shadow: 0 4px 20px rgba(54, 208, 255, 0.4);
+  transform: translateY(-1px);
 }
 
 h1 {
-  margin: 0 0 18px;
-  font-size: 28px;
-  letter-spacing: 0.4px;
+  margin: 0 0 24px;
+  font-size: 32px;
+  letter-spacing: 0.5px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #ffffff, #36d0ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .form {
@@ -61,17 +106,20 @@ label {
 }
 
 input {
-  border: 1px solid rgba(255, 255, 255, 0.15);
-  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
   color: #f5f7ff;
-  border-radius: 10px;
-  padding: 12px 14px;
+  border-radius: 12px;
+  padding: 14px 16px;
   font-size: 15px;
+  transition: all 0.3s ease;
 }
 
 input:focus {
-  outline: 2px solid #6bd0ff;
-  border-color: transparent;
+  outline: none;
+  border-color: rgba(54, 208, 255, 0.5);
+  background: rgba(255, 255, 255, 0.15);
+  box-shadow: 0 0 0 3px rgba(54, 208, 255, 0.1);
 }
 
 button {
@@ -80,7 +128,7 @@ button {
   border: none;
   border-radius: 10px;
   background: linear-gradient(135deg, #4f7cff, #36d0ff);
-  color: #071026;
+  color: #ffffff;
   font-weight: 700;
   font-size: 15px;
   cursor: pointer;
@@ -127,4 +175,41 @@ button:not(:disabled):hover {
     rgba(255, 255, 255, 0.25) 50%,
     rgba(255, 255, 255, 0) 100%
   );
+}
+
+.register-hint {
+  margin-top: 20px;
+  text-align: center;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.register-link {
+  background: none;
+  border: none;
+  color: #36d0ff;
+  cursor: pointer;
+  font-weight: 600;
+  padding: 0;
+  margin: 0;
+  text-decoration: underline;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.register-link:hover {
+  color: #4f7cff;
+  transform: none;
+  box-shadow: none;
+}
+
+@media (max-width: 900px) {
+  .app {
+    justify-content: center;
+    padding: 24px;
+  }
+
+  .card {
+    width: min(440px, 92vw);
+  }
 }
