@@ -1,7 +1,11 @@
 /* Thème: jamais-a-tek – Groupes de particules se déplaçant ensemble */
-import { Fx } from '../shared';
+import { Fx, withImageOverlay } from '../shared';
 import { crowdFx } from '../effects/crowdFx';
+import jamaisImg from '../pics-for-themes/jamais-a-tek.png';
 
 export default function jamaisATek(): Fx {
-  return crowdFx(['#7c4dff', '#536dfe', '#448aff', '#40c4ff', '#18ffff']);
+  return withImageOverlay(
+    crowdFx(['#fff', '#eee', '#ddd', '#ccc', '#bbb']),
+    [jamaisImg], 'cluster',
+  );
 }

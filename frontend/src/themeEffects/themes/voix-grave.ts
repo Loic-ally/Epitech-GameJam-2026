@@ -1,7 +1,11 @@
 /* Thème: voix-grave – Ondes basses profondes */
-import { Fx } from '../shared';
+import { Fx, withImageOverlay } from '../shared';
 import { bassFx } from '../effects/bassFx';
+import voixImg from '../pics-for-themes/voix-grave.png';
 
 export default function voixGrave(): Fx {
-  return bassFx(['#4a148c', '#6a1b9a', '#8e24aa', '#7b1fa2', '#e1bee7']);
+  return withImageOverlay(
+    bassFx(['#fff', '#eee', '#ddd', '#ccc', '#bbb']),
+    [voixImg], 'bass',
+  );
 }

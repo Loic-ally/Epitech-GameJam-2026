@@ -1,7 +1,8 @@
 /* Thème: chinois-de-la-caille – Néon urbain flashy */
-import { Fx } from '../shared';
-import { glitchFx } from '../effects/glitchFx';
+import { Fx, withImageOverlay } from '../shared';
+import { glitchChinoisFx } from '../effects/glitchChinoisFx';
+import chinoisImg from '../pics-for-themes/chinois-de-la-caille.png';
 
 export default function chinoisDeLaCaille(): Fx {
-  return glitchFx(['#ff00ff', '#00ffff', '#ff0066', '#00ff99'], true);
+  return withImageOverlay(glitchChinoisFx(), [chinoisImg], 'neon');
 }

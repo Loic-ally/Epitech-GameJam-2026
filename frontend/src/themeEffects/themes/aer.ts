@@ -1,7 +1,9 @@
 /* Thème: aer – Vent, traînées horizontales rapides bleu/blanc */
-import { Fx } from '../shared';
-import { streakFx } from '../effects/streakFx';
+import { Fx, withImageOverlay } from '../shared';
+import { streakAerFx } from '../effects/streakAerFx';
+import aer1Img from '../pics-for-themes/aer-1.png';
+import aer2Img from '../pics-for-themes/aer-2.png';
 
 export default function aer(): Fx {
-  return streakFx(['#a8d8ea', '#e0f7ff', '#ffffff', '#7ec8e3'], 400, 0.7, 60);
+  return withImageOverlay(streakAerFx(), [aer1Img, aer2Img], 'streak');
 }

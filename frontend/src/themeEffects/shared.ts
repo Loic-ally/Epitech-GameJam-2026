@@ -115,3 +115,266 @@ export function drawBolt(ctx: CanvasRenderingContext2D, b: Bolt, a: number) {
     drawPath(ctx, br, 0.7, '#fff', 6, a * 0.65);
   }
 }
+
+/* ══════════════════════════════════════════════════════════════
+   IMAGE OVERLAY COMPOSITING
+   ══════════════════════════════════════════════════════════════ */
+
+export type ImgStyle =
+  | 'shake' | 'rise' | 'streak' | 'faint' | 'flare' | 'shimmer'
+  | 'glitch' | 'neon' | 'drop' | 'sway' | 'drowsy'
+  | 'explode' | 'pulse' | 'bounce' | 'grow' | 'cascade'
+  | 'chaos' | 'sepia' | 'cluster' | 'fizz' | 'bass';
+
+/** Empty Fx – does nothing. Useful as base for image-only overlays. */
+export function nullFx(): Fx {
+  return { init() {}, frame() {} };
+}
+
+function loadImg(src: string): HTMLImageElement {
+  const img = new Image();
+  img.src = src;
+  return img;
+}
+
+function imgDims(img: HTMLImageElement, w: number, h: number): [number, number] {
+  const maxSz = Math.min(w, h) * 0.38;
+  const r = img.naturalWidth / img.naturalHeight;
+  return r >= 1 ? [maxSz, maxSz / r] : [maxSz * r, maxSz];
+}
+
+/** Compose a base Fx with themed image overlay(s) */
+export function withImageOverlay(base: Fx, srcs: string[], style: ImgStyle): Fx {
+  const imgs = srcs.map(loadImg);
+  return {
+    init(w, h) { base.init(w, h); },
+    frame(ctx, w, h, t, dt) {
+      base.frame(ctx, w, h, t, dt);
+      for (let i = 0; i < imgs.length; i++) {
+        const img = imgs[i];
+        if (!img.complete || !img.naturalWidth) continue;
+        renderStyledImg(ctx, img, w, h, t, style, i, imgs.length);
+      }
+    },
+  };
+}
+
+function renderStyledImg(
+  ctx: CanvasRenderingContext2D, img: HTMLImageElement,
+  w: number, h: number, t: number,
+  style: ImgStyle, idx: number, total: number,
+) {
+  const [iw, ih] = imgDims(img, w, h);
+  let x = (w - iw) / 2;
+  let y = (h - ih) / 2;
+
+  if (total > 1) {
+    const gap = iw * 0.15;
+    const totalW = total * iw + (total - 1) * gap;
+    x = (w - totalW) / 2 + idx * (iw + gap);
+  }
+
+  ctx.save();
+
+  switch (style) {
+    case 'shake':
+      x += Math.sin(t * 30) * 10;
+      y += Math.cos(t * 25) * 8;
+      ctx.globalAlpha = 0.85;
+      ctx.shadowColor = '#ff4400'; ctx.shadowBlur = 25 + Math.sin(t * 10) * 12;
+      ctx.drawImage(img, x, y, iw, ih);
+      break;
+
+    case 'rise': {
+      const c = (t * 0.25 + idx * 0.3) % 1;
+      y = h * (1.1 - c * 1.3);
+      ctx.globalAlpha = Math.sin(c * Math.PI) * 0.75;
+      ctx.drawImage(img, x, y, iw, ih);
+      break;
+    }
+
+    case 'streak': {
+      const sx = ((t * 350 + idx * w * 0.5) % (w + iw * 2)) - iw;
+      ctx.globalAlpha = 0.75;
+      ctx.shadowColor = '#88ddff'; ctx.shadowBlur = 18;
+      ctx.drawImage(img, sx, y, iw, ih);
+      break;
+    }
+
+    case 'faint':
+      ctx.globalAlpha = 0.12 + Math.sin(t * 1.5) * 0.06;
+      ctx.drawImage(img, x, y, iw, ih);
+      break;
+
+    case 'flare':
+      ctx.globalAlpha = 0.75 + Math.sin(t * 3) * 0.2;
+      ctx.shadowColor = '#ffd700'; ctx.shadowBlur = 35 + Math.sin(t * 4) * 18;
+      ctx.drawImage(img, x, y, iw, ih);
+      break;
+
+    case 'shimmer': {
+      const sh = Math.sin(t * 6) * 0.3 + 0.65;
+      ctx.globalAlpha = sh;
+      ctx.shadowColor = '#fff'; ctx.shadowBlur = 25 + Math.sin(t * 8) * 12;
+      x += Math.sin(t * 2) * 3;
+      ctx.drawImage(img, x, y, iw, ih);
+      break;
+    }
+
+    case 'glitch': {
+      const off = Math.random() < 0.2 ? rand(-20, 20) : 0;
+      ctx.globalCompositeOperation = 'screen';
+      ctx.globalAlpha = 0.25;
+      ctx.drawImage(img, x + off - 5, y, iw, ih);
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.globalAlpha = 0.85;
+      ctx.drawImage(img, x + off, y, iw, ih);
+      ctx.globalCompositeOperation = 'screen';
+      ctx.globalAlpha = 0.2;
+      ctx.drawImage(img, x + off + 5, y + 2, iw, ih);
+      break;
+    }
+
+    case 'neon':
+      ctx.shadowColor = '#ff00ff'; ctx.shadowBlur = 45;
+      ctx.globalAlpha = 0.9;
+      ctx.drawImage(img, x, y, iw, ih);
+      ctx.shadowColor = '#00ffff'; ctx.shadowBlur = 30;
+      ctx.globalAlpha = 0.3;
+      ctx.drawImage(img, x, y, iw, ih);
+      break;
+
+    case 'drop': {
+      const dc = (t * 0.4 + idx * 0.4) % 1;
+      y = -ih + dc * (h + ih * 2);
+      ctx.globalAlpha = Math.sin(dc * Math.PI) * 0.8;
+      ctx.drawImage(img, x, y, iw, ih);
+      break;
+    }
+
+    case 'sway':
+      x += Math.sin(t * 0.7) * 35;
+      y += Math.cos(t * 0.4) * 25;
+      ctx.globalAlpha = 0.55 + Math.sin(t) * 0.2;
+      ctx.translate(x + iw / 2, y + ih / 2);
+      ctx.rotate(Math.sin(t * 0.5) * 0.1);
+      ctx.drawImage(img, -iw / 2, -ih / 2, iw, ih);
+      break;
+
+    case 'drowsy': {
+      const d = (Math.sin(t * 0.4) + 1) * 0.5;
+      ctx.globalAlpha = d * 0.45;
+      y += Math.sin(t * 0.25) * 20;
+      ctx.drawImage(img, x, y, iw, ih);
+      break;
+    }
+
+    case 'explode': {
+      const age = t % 3.5;
+      const s = age < 0.3 ? 0.2 + (age / 0.3) * 1.8
+        : age < 1 ? 2 - (age - 0.3)
+        : 1 + Math.sin(t * 2) * 0.05;
+      ctx.globalAlpha = age < 0.1 ? age * 10 : age < 3 ? 0.9 : Math.max(0, (3.5 - age) * 2);
+      ctx.translate(w / 2, h / 2);
+      ctx.scale(s, s);
+      if (age < 0.4) { ctx.shadowColor = '#fff'; ctx.shadowBlur = 60; }
+      ctx.drawImage(img, -iw / 2, -ih / 2, iw, ih);
+      break;
+    }
+
+    case 'pulse': {
+      const ps = 1 + Math.sin(t * 4) * 0.1;
+      ctx.globalAlpha = 0.65 + Math.sin(t * 4) * 0.25;
+      ctx.shadowColor = '#00e676'; ctx.shadowBlur = 18 + Math.sin(t * 4) * 12;
+      ctx.translate(x + iw / 2, y + ih / 2);
+      ctx.scale(ps, ps);
+      ctx.drawImage(img, -iw / 2, -ih / 2, iw, ih);
+      break;
+    }
+
+    case 'bounce': {
+      const bt = t * 2.5;
+      const by = Math.abs(Math.sin(bt)) * h * 0.25;
+      y = h * 0.55 - by - ih;
+      const sq = 1 + Math.cos(bt) * 0.12;
+      ctx.globalAlpha = 0.85;
+      ctx.translate(x + iw / 2, y + ih);
+      ctx.scale(1 / sq, sq);
+      ctx.drawImage(img, -iw / 2, -ih, iw, ih);
+      break;
+    }
+
+    case 'grow': {
+      const gs = Math.min(t * 0.4, 1.15);
+      ctx.globalAlpha = Math.min(t * 0.7, 0.85);
+      ctx.shadowColor = '#ff1744'; ctx.shadowBlur = 18;
+      ctx.translate(w / 2, h / 2);
+      ctx.scale(gs, gs);
+      ctx.drawImage(img, -iw / 2, -ih / 2, iw, ih);
+      break;
+    }
+
+    case 'cascade': {
+      const cy = ((t * 90 + idx * 250) % (h + ih * 2)) - ih;
+      const cx = w * (0.25 + idx * 0.25);
+      ctx.globalAlpha = 0.7;
+      ctx.shadowColor = '#00ff41'; ctx.shadowBlur = 12;
+      ctx.drawImage(img, cx, cy, iw * 0.8, ih * 0.8);
+      break;
+    }
+
+    case 'chaos': {
+      const cx = (Math.sin(t * 7 + idx * 3) * 0.5 + 0.5) * (w - iw);
+      const cy = (Math.cos(t * 5 + idx * 2) * 0.5 + 0.5) * (h - ih);
+      ctx.globalAlpha = 0.75 + Math.sin(t * 10) * 0.2;
+      ctx.translate(cx + iw / 2, cy + ih / 2);
+      ctx.rotate(t * 2);
+      ctx.shadowColor = `hsl(${(t * 120) % 360},100%,50%)`; ctx.shadowBlur = 30;
+      ctx.drawImage(img, -iw / 2, -ih / 2, iw, ih);
+      break;
+    }
+
+    case 'sepia':
+      ctx.globalAlpha = 0.55 + Math.sin(t * 0.4) * 0.15;
+      x += Math.sin(t * 0.15) * 3;
+      ctx.drawImage(img, x, y, iw, ih);
+      break;
+
+    case 'cluster': {
+      const ang = t * 0.5 + idx * TAU / Math.max(total, 1);
+      const rad = Math.min(w, h) * 0.12;
+      const cx2 = w / 2 + Math.cos(ang) * rad - iw / 2;
+      const cy2 = h / 2 + Math.sin(ang) * rad - ih / 2;
+      ctx.globalAlpha = 0.8;
+      ctx.shadowColor = '#7c4dff'; ctx.shadowBlur = 14;
+      ctx.drawImage(img, cx2, cy2, iw, ih);
+      break;
+    }
+
+    case 'fizz': {
+      const fc = (t * 0.35 + idx * 0.4) % 1;
+      y = h * (1.05 - fc * 1.2);
+      x += Math.sin(t * 12) * 10;
+      ctx.globalAlpha = Math.sin(fc * Math.PI) * 0.8;
+      ctx.shadowColor = '#c6ff00'; ctx.shadowBlur = 16;
+      ctx.drawImage(img, x, y, iw, ih);
+      break;
+    }
+
+    case 'bass': {
+      const bs = 1 + Math.sin(t * 3) * 0.18;
+      ctx.globalAlpha = 0.6 + Math.abs(Math.sin(t * 3)) * 0.35;
+      ctx.shadowColor = '#8e24aa'; ctx.shadowBlur = 25 + Math.sin(t * 3) * 18;
+      ctx.translate(x + iw / 2, y + ih / 2);
+      ctx.scale(bs, bs);
+      ctx.drawImage(img, -iw / 2, -ih / 2, iw, ih);
+      break;
+    }
+
+    default:
+      ctx.globalAlpha = 0.7;
+      ctx.drawImage(img, x, y, iw, ih);
+  }
+
+  ctx.restore();
+}

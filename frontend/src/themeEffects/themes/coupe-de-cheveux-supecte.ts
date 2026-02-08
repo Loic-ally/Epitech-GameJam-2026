@@ -1,7 +1,8 @@
 /* Thème: coupe-de-cheveux-supecte – Mèches colorées tombantes */
-import { Fx } from '../shared';
-import { sparksFx } from '../effects/sparksFx';
+import { Fx, withImageOverlay } from '../shared';
+import { sparksCoupeFx } from '../effects/sparksCoupeFx';
+import coupeImg from '../pics-for-themes/coupe-supecte.png';
 
 export default function coupeDeCheveuXSupecte(): Fx {
-  return sparksFx(['#e040fb', '#ea80fc', '#ce93d8', '#f48fb1'], 200, 180);
+  return withImageOverlay(sparksCoupeFx(), [coupeImg], 'drop');
 }
