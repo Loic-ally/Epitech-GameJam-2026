@@ -4,7 +4,6 @@ import { CardsController } from './cards.controller.js';
 const cardsRouter = Router();
 const cardsController = new CardsController();
 
-cardsRouter.get('/invocator/:id', cardsController.getInvocatorCardById);
-cardsRouter.get('/unit/:parent_id/:id', cardsController.getUnitCardById);
+cardsRouter.get('/', (req, res) => cardsController.getAll(req, res));
 
 export { cardsRouter };

@@ -4,12 +4,34 @@ import { Card, CardRarity } from './gacha.types.js';
 import { InventoryRepository } from '../inventory/inventory.repository.js';
 import { Inventory } from '../../types/inventory.type.js';
 import { GachaRepository } from './gacha.repository.js';
+import { loadAllUnitCards } from '../../utils/cardLoader.js';
 
 const DATA_PATH = path.join(process.cwd(), 'public', 'invocator-card', 'invocator-card.json');
 
+function normalizeRarity(raw: string | undefined): CardRarity {
+  const value = (raw ?? '').toLowerCase();
+  if (value === 'commune' || value === 'common') return 'common';
+  if (value === 'rare') return 'rare';
+  if (value === 'epique' || value === 'epic') return 'epic';
+  if (value === 'legendaire' || value === 'legendary') return 'legendary';
+  return 'common';
+}
+
 function loadCards(): Card[] {
-  const raw = fs.readFileSync(DATA_PATH, 'utf-8');
-  return JSON.parse(raw) as Card[];
+  const invocatorsRaw = fs.readFileSync(DATA_PATH, 'utf-8');
+  const invocators = (JSON.parse(invocatorsRaw) as any[]).map((card) => ({
+    ...card,
+    cardType: 'summoner' as const,
+    rarity: normalizeRarity(card.rarity),
+  }));
+
+  const units = loadAllUnitCards().map((card) => ({
+    ...card,
+    cardType: 'unit' as const,
+    rarity: normalizeRarity(card.rarity),
+  }));
+
+  return [...invocators, ...units] as Card[];
 }
 
 const allCards = loadCards();
@@ -36,18 +58,30 @@ export class GachaService {
     this.gachaRepo = new GachaRepository();
   }
 
-  private pickFromRarity(rarity: CardRarity, exclude: Set<number>): Card | null {
-    const pool = cardsByRarity[rarity].filter((c) => !exclude.has(c.id));
+  private flattenIds(value: unknown): number[] {
+    if (Array.isArray(value)) {
+      return value.flat(Infinity).filter((v) => typeof v === 'number') as number[];
+    }
+    if (typeof value === 'number') return [value];
+    return [];
+  }
+
+  private cardKey(card: Card): string {
+    return `${card.cardType}:${card.id}`;
+  }
+
+  private pickFromRarity(rarity: CardRarity, exclude: Set<string>): Card | null {
+    const pool = cardsByRarity[rarity].filter((c) => !exclude.has(this.cardKey(c)));
     if (pool.length === 0) return null;
     const card = pool[Math.floor(Math.random() * pool.length)];
-    exclude.add(card.id);
+    exclude.add(this.cardKey(card));
     return card;
   }
 
-  private pickAny(exclude: Set<number>): Card {
-    const pool = allCards.filter((c) => !exclude.has(c.id));
+  private pickAny(exclude: Set<string>): Card {
+    const pool = allCards.filter((c) => !exclude.has(this.cardKey(c)));
     const card = (pool.length ? pool : allCards)[Math.floor(Math.random() * (pool.length ? pool.length : allCards.length))];
-    exclude.add(card.id);
+    exclude.add(this.cardKey(card));
     return card;
   }
 
@@ -61,7 +95,7 @@ export class GachaService {
     return 'common';
   }
 
-  private enforceGuarantees(pulls: Card[], count: 1 | 10, pityLegendaryReady: boolean, exclude: Set<number>) {
+  private enforceGuarantees(pulls: Card[], count: 1 | 10, pityLegendaryReady: boolean, exclude: Set<string>) {
     if (pityLegendaryReady) {
       const legendary = this.pickFromRarity('legendary', exclude);
       if (legendary) pulls[0] = legendary;
@@ -86,22 +120,29 @@ export class GachaService {
 
   async pull(userId: string, count: 1 | 10) {
     const inv = await this.inventoryRepo.getInventory(userId);
-    const owned = new Set<number>([
-      ...(inv?.summonerCards ?? []),
-      ...(inv?.unitCards ?? []),
-      ...(inv?.activeCards ?? []),
+    const ownedSummoners = this.flattenIds(inv?.summonerCards);
+    const ownedUnits = this.flattenIds(inv?.unitCards);
+    const currentTickets = typeof inv?.tickets === 'number' ? inv.tickets : 20;
+
+    if (currentTickets < count) {
+      const err = new Error('NOT_ENOUGH_TICKETS');
+      throw err;
+    }
+    const ownedKeys = new Set<string>([
+      ...ownedSummoners.map((id) => `summoner:${id}`),
+      ...ownedUnits.map((id) => `unit:${id}`),
     ]);
 
-    const available = allCards.filter((c) => !owned.has(c.id));
+    const available = allCards.filter((c) => !ownedKeys.has(this.cardKey(c)));
     if (available.length === 0) {
-      return { pulls: [], remainingPool: 0 };
+      return { pulls: [], remainingPool: 0, tickets: currentTickets };
     }
 
     const state = (await this.gachaRepo.getState(userId)) ?? { userId, pullsSinceLegendary: 0 };
     const pityReady = state.pullsSinceLegendary >= 79;
 
     const pulls: Card[] = [];
-    const exclude = new Set<number>(owned);
+    const exclude = new Set<string>(ownedKeys);
 
     for (let i = 0; i < count && pulls.length < available.length; i++) {
       const rarity = this.rollRarity();
@@ -115,12 +156,23 @@ export class GachaService {
     this.enforceGuarantees(pulls, count, pityReady, exclude);
 
     // update inventory with new cards
-    const newIds = pulls.map((c) => c.id);
+    const nextSummoners = new Set<number>(ownedSummoners);
+    const nextUnits = new Set<number>(ownedUnits);
+
+    for (const card of pulls) {
+      if (card.cardType === 'summoner') {
+        nextSummoners.add(card.id);
+      } else if (card.cardType === 'unit') {
+        nextUnits.add(card.id);
+      }
+    }
+
     const nextInventory: Inventory = {
       userId,
-      summonerCards: inv?.summonerCards ?? [],
-      unitCards: Array.from(new Set([...(inv?.unitCards ?? []), ...newIds])),
+      summonerCards: Array.from(nextSummoners),
+      unitCards: Array.from(nextUnits),
       activeCards: inv?.activeCards ?? [],
+      tickets: currentTickets - count,
     };
     await this.inventoryRepo.updateInventory(userId, nextInventory);
 
@@ -129,7 +181,25 @@ export class GachaService {
     const newPity = pulledLegendary ? 0 : state.pullsSinceLegendary + count;
     await this.gachaRepo.saveState(userId, { userId, pullsSinceLegendary: newPity });
 
-    const remainingPool = Math.max(0, allCards.length - nextInventory.unitCards.length);
-    return { pulls, remainingPool };
+    const remainingPool = Math.max(0, allCards.length - (nextSummoners.size + nextUnits.size));
+    return { pulls, remainingPool, tickets: nextInventory.tickets };
+  }
+
+  async getStatus(userId: string) {
+    const inv = await this.inventoryRepo.getInventory(userId);
+    const ownedSummoners = this.flattenIds(inv?.summonerCards);
+    const ownedUnits = this.flattenIds(inv?.unitCards);
+    const currentTickets = typeof inv?.tickets === 'number' ? inv.tickets : 20;
+    const ownedKeys = new Set<string>([
+      ...ownedSummoners.map((id) => `summoner:${id}`),
+      ...ownedUnits.map((id) => `unit:${id}`),
+    ]);
+    const remainingPool = Math.max(0, allCards.length - ownedKeys.size);
+    return {
+      remainingPool,
+      totalPool: allCards.length,
+      ownedCount: ownedKeys.size,
+      tickets: currentTickets,
+    };
   }
 }

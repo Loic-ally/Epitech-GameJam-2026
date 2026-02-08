@@ -14,6 +14,8 @@ import { deckRouter } from "./modules/deck/deck.routes.js";
 import { cardsRouter } from "./modules/cards/cards.routes.js";
 import { gachaRouter } from "./modules/gacha/gacha.routes.js";
 import { BattleArena } from "./rooms/BattleArena.js";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const server = defineServer({
     rooms: {
@@ -22,6 +24,10 @@ const server = defineServer({
     },
 
     express: (app) => {
+        const __filename = fileURLToPath(import.meta.url);
+        const __dirname = path.dirname(__filename);
+        const publicDir = path.join(__dirname, "../public");
+
         app.use(express.json());
         app.use(express.static('public'))
 
@@ -37,15 +43,18 @@ const server = defineServer({
         app.use("/auth", authRouter);
         app.use("/inventory", verifyAccess, inventoryRouter);
         app.use("/deck", verifyAccess, deckRouter);
-        app.use("/cards", cardsRouter);
+        app.use("/cards", verifyAccess, cardsRouter);
         app.use("/gacha", verifyAccess, gachaRouter);
 
         // API-prefixed paths for frontend defaults
         app.use("/api/auth", authRouter);
         app.use("/api/inventory", verifyAccess, inventoryRouter);
         app.use("/api/deck", verifyAccess, deckRouter);
-        app.use("/api/cards", cardsRouter);
+        app.use("/api/cards", verifyAccess, cardsRouter);
         app.use("/api/gacha", verifyAccess, gachaRouter);
+
+        app.use("/unit-card", express.static(path.join(publicDir, "unit-card")));
+        app.use("/invocator-card", express.static(path.join(publicDir, "invocator-card")));
 
         app.use("/monitor", monitor());
 
