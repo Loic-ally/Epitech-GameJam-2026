@@ -8,7 +8,7 @@ export class InventoryService {
         this.inventoryRepository = new InventoryRepository();
     }
 
-    async addCard(userId: string, cardId: number, cardType: 'summonerCards' | 'unitCards' | 'activeCards') {
+    async addCard(userId: string, cardId: number | number[], cardType: 'summonerCards' | 'unitCards' | 'activeCards') {
         const userInventory = await this.inventoryRepository.getInventory(userId);
 
         const inventory: Inventory = {
@@ -17,7 +17,8 @@ export class InventoryService {
             unitCards: [],
             activeCards: [],
         }
-        inventory[cardType].push(cardId);
+
+        inventory[cardType].push(cardId as any);
 
         if (!userInventory) {
             await this.inventoryRepository.createInventory(inventory);

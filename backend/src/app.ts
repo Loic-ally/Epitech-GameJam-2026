@@ -11,6 +11,7 @@ import { authRouter } from "./modules/auth/auth.routes.js";
 import { inventoryRouter } from "./modules/inventory/inventory.routes.js";
 import { verifyAccess } from "./middlewares/auth.js";
 import { deckRouter } from "./modules/deck/deck.routes.js";
+import { cardsRouter } from "./modules/cards/cards.routes.js";
 import { BattleArena } from "./rooms/BattleArena.js";
 
 const server = defineServer({
@@ -21,6 +22,7 @@ const server = defineServer({
 
     express: (app) => {
         app.use(express.json());
+        app.use(express.static('public'))
 
         app.use(cors({
             origin: [
@@ -33,6 +35,7 @@ const server = defineServer({
         app.use("/auth", authRouter);
         app.use("/inventory", verifyAccess, inventoryRouter);
         app.use("/deck", verifyAccess, deckRouter);
+        app.use("/cards", cardsRouter);
 
         app.use("/monitor", monitor());
 

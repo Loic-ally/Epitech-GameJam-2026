@@ -8,7 +8,7 @@ export class DeckService {
         this.deckRepository = new DeckRepository();
     }
 
-    async changeDeck(userId: string, summonerCards: number, unitCards: number[], activeCards: number[]) {
+    async changeDeck(userId: string, summonerCards: number, unitCards: number[][], activeCards: number[][]) {
         const userDeck = await this.deckRepository.getDeck(userId);
         const deck = {
             userId,
