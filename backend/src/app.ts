@@ -12,6 +12,7 @@ import { inventoryRouter } from "./modules/inventory/inventory.routes.js";
 import { verifyAccess } from "./middlewares/auth.js";
 import { deckRouter } from "./modules/deck/deck.routes.js";
 import { cardsRouter } from "./modules/cards/cards.routes.js";
+import { gachaRouter } from "./modules/gacha/gacha.routes.js";
 import { BattleArena } from "./rooms/BattleArena.js";
 
 const server = defineServer({
@@ -32,10 +33,19 @@ const server = defineServer({
             credentials: true,
         }));
 
+        // legacy paths
         app.use("/auth", authRouter);
         app.use("/inventory", verifyAccess, inventoryRouter);
         app.use("/deck", verifyAccess, deckRouter);
         app.use("/cards", cardsRouter);
+        app.use("/gacha", verifyAccess, gachaRouter);
+
+        // API-prefixed paths for frontend defaults
+        app.use("/api/auth", authRouter);
+        app.use("/api/inventory", verifyAccess, inventoryRouter);
+        app.use("/api/deck", verifyAccess, deckRouter);
+        app.use("/api/cards", cardsRouter);
+        app.use("/api/gacha", verifyAccess, gachaRouter);
 
         app.use("/monitor", monitor());
 
