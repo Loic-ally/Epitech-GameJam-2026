@@ -8,8 +8,8 @@ interface StartScreenProps {
 export const StartScreen: React.FC<StartScreenProps> = ({ onStart }) => {
   return (
     <div className="start-screen">
-      <h1 className="game-title">GatchaTek</h1>
-      <p className="start-hint">Tap to enter the island</p>
+      <h1 className="game-title">EpiGang</h1>
+      <p className="start-hint">Click enter to get flammed</p>
       <button className="start-button" type="button" onClick={onStart}>
         Enter
       </button>
